@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Egg Pets</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#18251a;
+}
+
+body{
+    touch-action:none;
+}
+
+button{
+    font-family:Arial,sans-serif;
+}
+
+#game{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#75bd68;
+}
+
+#world{
+    position:absolute;
+    width:3200px;
+    height:1900px;
+    transform-origin:0 0;
+    background:
+        radial-gradient(circle at 10% 20%,#ffffff18 0 2px,transparent 3px),
+        radial-gradient(circle at 30% 70%,#ffffff18 0 2px,transparent 3px),
+        radial-gradient(circle at 55% 25%,#ffffff18 0 2px,transparent 3px),
+        radial-gradient(circle at 80% 65%,#ffffff18 0 2px,transparent 3px),
+        #75bd68;
+}
+
+/* ESTRADAS */
+
+.road{
+    position:absolute;
+    background:#c8aa76;
+    border-top:10px solid #92764a;
+    border-bottom:10px solid #92764a;
+}
+
+.road.horizontal{
+    left:0;
+    top:870px;
+    width:3200px;
+    height:150px;
+}
+
+.road.vertical{
+    left:600px;
+    top:0;
+    width:130px;
+    height:1900px;
+}
+
+/* BASE */
+
+#base{
+    position:absolute;
+    left:110px;
+    top:680px;
+    width:430px;
+    height:430px;
+    background:#b9df8b;
+    border:10px solid #744b28;
+    border-radius:35px;
+    box-shadow:0 12px 0 #0003;
+}
+
+.baseFence{
+    position:absolute;
+    inset:-20px;
+    border:8px dashed #996733;
+    border-radius:45px;
+    pointer-events:none;
+}
+
+#base h1{
+    text-align:center;
+    margin-top:18px;
+    color:#29421f;
+    font-size:29px;
+}
+
+.baseSubtitle{
+    text-align:center;
+    color:#314a27;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+#eggSlots{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:13px;
+    padding:28px;
+}
+
+.slot{
+    height:125px;
+    background:#ffffff88;
+    border:4px solid #80633e;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    font-size:42px;
+}
+
+.slot small{
+    position:absolute;
+    bottom:7px;
+    font-size:11px;
+    color:#222;
+    text-align:center;
+}
+
+.slot button{
+    position:absolute;
+    bottom:8px;
+    background:#1687d9;
+    color:white;
+    border:0;
+    padding:5px 8px;
+    border-radius:7px;
+    font-size:10px;
+}
+
+/* ÁREAS */
+
+.area{
+    position:absolute;
+    width:410px;
+    height:330px;
+    border:10px solid #493528;
+    border-radius:40px;
+    box-shadow:0 10px 0 #0003
