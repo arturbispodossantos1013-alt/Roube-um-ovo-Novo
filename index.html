@@ -2559,3 +2559,264 @@ startGame();
 
 </body>
     </html>
+<!-- PAINEL DE EVENTOS -->
+<div class="event-panel">
+  <h3>🎉 Eventos</h3>
+
+  <button onclick="startEvent('halloween')">
+    🎃 Halloween ×2
+  </button>
+
+  <button onclick="startEvent('natal')">
+    🎄 Natal ×2,5
+  </button>
+
+  <button onclick="startEvent('meteorito')">
+    ☄️ Meteorito ×3,5
+  </button>
+
+  <button onclick="startEvent('money2x')">
+    💰 2× Dinheiro
+  </button>
+
+  <button onclick="startEvent('speed2x')">
+    ⚡ 2× Velocidade
+  </button>
+
+  <div id="eventStatus">
+    Nenhum evento ativo.
+  </div>
+</div>
+
+<script>
+const EVENTS = {
+  halloween: {
+    name: "🎃 Halloween",
+    multiplier: 2
+  },
+
+  natal: {
+    name: "🎄 Natal",
+    multiplier: 2.5
+  },
+
+  meteorito: {
+    name: "☄️ Meteorito",
+    multiplier: 3.5
+  },
+
+  money2x: {
+    name: "💰 2× Dinheiro",
+    multiplier: 2
+  },
+
+  speed2x: {
+    name: "⚡ 2× Velocidade",
+    multiplier: 2
+  }
+};
+
+const activeEvents = {};
+
+// Todos os eventos duram 5 minutos
+function startEvent(eventId) {
+  if (!EVENTS[eventId]) return;
+
+  activeEvents[eventId] = Date.now() + 5 * 60 * 1000;
+
+  updateEventStatus();
+
+  alert(
+    EVENTS[eventId].name +
+    " ativado por 5 minutos!"
+  );
+}
+
+// Verifica se o evento está ativo
+function isEventActive(eventId) {
+  if (!activeEvents[eventId]) {
+    return false;
+  }
+
+  if (Date.now() >= activeEvents[eventId]) {
+    delete activeEvents[eventId];
+    return false;
+  }
+
+  return true;
+}
+
+// Calcula o multiplicador dos pagamentos
+function getEventMultiplier() {
+  let multiplier = 1;
+
+  if (isEventActive("halloween")) {
+    multiplier *= 2;
+  }
+
+  if (isEventActive("natal")) {
+    multiplier *= 2.5;
+  }
+
+  if (isEventActive("meteorito")) {
+    multiplier *= 3.5;
+  }
+
+  if (isEventActive("money2x")) {
+    multiplier *= 2;
+  }
+
+  return multiplier;
+}
+
+// Calcula o pagamento final do pet
+function getPetEventValue(baseValue) {
+  return Math.floor(
+    baseValue * getEventMultiplier()
+  );
+}
+
+// Verifica o evento de velocidade
+function getSpeedEventMultiplier() {
+  if (isEventActive("speed2x")) {
+    return 2;
+  }
+
+  return 1;
+}
+
+// Atualiza o texto dos eventos
+function updateEventStatus() {
+  const status = document.getElementById("eventStatus");
+
+  if (!status) return;
+
+  const active = [];
+
+  for (const eventId in EVENTS) {
+    if (isEventActive(eventId)) {
+      const remaining =
+        Math.max(
+          0,
+          activeEvents[eventId] - Date.now()
+        );
+
+      const minutes =
+        Math.floor(remaining / 60000);
+
+      const seconds =
+        Math.floor(
+          (remaining % 60000) / 1000
+        );
+
+      active.push(
+        EVENTS[eventId].name +
+        " — " +
+        minutes +
+        ":" +
+        String(seconds).padStart(2, "0")
+      );
+    }
+  }
+
+  if (active.length === 0) {
+    status.innerHTML = "Nenhum evento ativo.";
+  } else {
+    status.innerHTML =
+      "<b>Eventos ativos:</b><br>" +
+      active.join("<br>");
+  }
+}
+
+// Atualiza o contador a cada segundo
+setInterval(updateEventStatus, 1000);
+</script>
+
+<style>
+.event-panel {
+  background: #202020;
+  color: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 10px;
+  max-width: 320px;
+}
+
+.event-panel h3 {
+  margin-top: 0;
+}
+
+.event-panel button {
+  display: block;
+  width: 100%;
+  margin: 7px 0;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.event-panel button:active {
+  transform: scale(0.97);
+}
+
+#eventStatus {
+  margin-top: 12px;
+  padding: 10px;
+  background: #111;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+</style><!-- BOTÃO MODO LENTO -->
+<button id="slowModeBtn">
+  🐢 Modo Lento: OFF
+</button>
+
+<script>
+let slowMode = false;
+let speedBeforeSlow = 1;
+
+function toggleSlowMode() {
+  slowMode = !slowMode;
+
+  if (slowMode) {
+    // Guarda a velocidade atual
+    speedBeforeSlow = state.speedLevel;
+
+    // Coloca na velocidade 1
+    state.speedLevel = 1;
+
+    document.getElementById("slowModeBtn").textContent =
+      "🐢 Modo Lento: ON";
+
+  } else {
+    // Volta para a velocidade que o jogador tinha
+    state.speedLevel = speedBeforeSlow;
+
+    document.getElementById("slowModeBtn").textContent =
+      "🐢 Modo Lento: OFF";
+  }
+}
+
+document
+  .getElementById("slowModeBtn")
+  .addEventListener("click", toggleSlowMode);
+</script>
+
+<style>
+#slowModeBtn {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #333;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#slowModeBtn:active {
+  transform: scale(0.96);
+}
+</style>
