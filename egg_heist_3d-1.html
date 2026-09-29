@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Egg Heist 3D</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111f;font-family:Arial,sans-serif;color:#fff}
+#game{position:fixed;inset:0}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+.top{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;gap:10px}
+.card{background:rgba(7,13,25,.78);border:1px solid rgba(255,255,255,.14);border-radius:15px;padding:10px 14px;backdrop-filter:blur(8px);box-shadow:0 8px 25px #0005}
+.money{font-weight:900;color:#72ff9a;font-size:20px}.level{font-size:12px;color:#aebbd0;margin-top:3px}
+#message{position:absolute;top:82px;left:50%;transform:translateX(-50%);background:#0b1730dd;border:1px solid #ffffff22;border-radius:14px;padding:10px 16px;font-weight:700;opacity:0;transition:.25s}
+#cross{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);opacity:.7}
+#cross:before,#cross:after{content:"";position:absolute;background:white;border-radius:3px}
+#cross:before{width:18px;height:2px;top:8px}.#cross:after{height:18px;width:2px;left:8px}
+#help{position:absolute;bottom:18px;left:18px;max-width:270px}
+#joystick{position:absolute;bottom:28px;left:25px;width:128px;height:128px;border-radius:50%;background:#ffffff16;border:2px solid #ffffff25;pointer-events:auto;touch-action:none}
+#stick{position:absolute;width:58px;height:58px;left:33px;top:33px;border-radius:50%;background:#ffffff35;border:2px solid #fff5}
+.actions{position:absolute;right:22px;bottom:25px;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}
+button{border:0;color:#fff;font-weight:900;font-size:15px;border-radius:16px;padding:15px 18px;background:linear-gradient(135deg,#7c4dff,#4f8cff);box-shadow:0 8px 22px #0006;min-width:118px}
+button:active{transform:scale(.95)}#steal{background:linear-gradient(135deg,#ff5d7d,#ff8b4d)}#dash{background:linear-gradient(135deg,#16c7a0,#178dff)}
+#shop{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#020711aa;pointer-events:auto}
+.modal{width:min(92vw,420px);background:#0b1428;border:1px solid #ffffff1f;border-radius:22px;padding:22px;box-shadow:0 20px 70px #000b}
+.modal h2{margin:0 0 8px}.item{display:flex;justify-content:space-between;align-items:center;background:#ffffff0a;padding:13px;border-radius:14px;margin:9px 0}
+.item button{min-width:92px;padding:10px}
+#tip{font-size:12px;color:#9eacc3;line-height:1.45}
+@media(min-width:800px){#joystick{width:150px;height:150px}.actions{right:35px}.card{font-size:15px}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+  <div class="top">
+    <div class="card"><div class="money">💰 <span id="money">150</span></div><div class="level">Nível <span id="level">1</span> • Ovos: <span id="eggs">0</span></div></div>
+    <div class="card" style="text-align:right">🥚 <b>EGG HEIST</b><div class="level">Roube. Proteja. Enriqueça.</div></div>
+  </div>
+  <div id="message"></div><div id="cross"></div>
+  <div id="help" class="card">🕹️ Arraste para andar<br>🥚 Chegue perto de um ovo e toque <b>ROUBAR</b><br>🏠 Leve o ovo até sua base para guardar</div>
+  <div id="joystick"><div id="stick"></div></div>
+  <div class="actions"><button id="steal">🥚 ROUBAR</button><button id="dash">⚡ CORRER</button><button id="shopBtn">🛒 LOJA</button></div>
+</div>
+<div id="shop"><div class="modal"><h2>🛒 Loja</h2><div id="shopItems"></div><p id="tip">Melhore velocidade, capacidade e renda dos ovos.</p><button id="close" style="width:100%">FECHAR</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x07111f);
+scene.fog=new THREE.Fog(0x07111f,35,100);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,180);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+document.querySelector('#game').appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xbdd7ff,0x1b2a1b,1.8));
+const sun=new THREE.DirectionalLight(0xffffff,2.4);sun.position.set(-25,35,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+
+const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.82});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(110,110),mat(0x163522));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+
+function box(x,y,z,sx,sy,sz,c,em=0){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:c,roughness:.75,emissive:em?c:0,emissiveIntensity:.35}));
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+}
+// paths / arena
+box(0,.015,0,12,.03,90,0x274b36);box(0,.02,0,90,.03,12,0x274b36);
+for(let x of [-38,38]) box(x,1,0,4,2,85,0x18263b);
+for(let z of [-38,38]) box(0,1,z,85,2,4,0x18263b);
+// decorative crates
+for(let i=0;i<22;i++){let x=(Math.random()-.5)*75,z=(Math.random()-.5)*75;if(Math.abs(x)<15&&Math.abs(z)<15)continue;box(x,.8,z,1.7,1.6,1.7,0x7a4c2b)}
+// bases
+function base(x,z,c,name){
+ box(x,.35,z,13,.7,13,c);
+ const roof=box(x,3,z,11,.35,11,0x172038);
+ roof.rotation.y=Math.PI/4;
+ box(x,1.7,z-5.5,8,2.7,.4,0x10182b);
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.font='bold 60px Arial';ctx.textAlign='center';ctx.fillText(name,256,75);
+ const tx=new THREE.CanvasTexture(canvas);const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true}));
+ spr.position.set(x,5,z-6);spr.scale.set(9,2.2,1);scene.add(spr);
+}
+base(-25,-25,0x3156d8,'SUA BASE');
+base(25,25,0xb63d63,'RIVAL');
+
+const player=new THREE.Group();
+const skin=mat(0xffc79d), shirt=mat(0x3478ff), pants=mat(0x18294d), shoe=mat(0x10151f), hair=mat(0x24160e);
+
+// torso
+const torso=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.35,.65),shirt);torso.position.y=1.55;torso.castShadow=true;player.add(torso);
+// head + hair
+const head=new THREE.Mesh(new THREE.SphereGeometry(.58,20,16),skin);head.position.y=2.75;head.castShadow=true;player.add(head);
+const hairMesh=new THREE.Mesh(new THREE.SphereGeometry(.59,20,10,0,Math.PI*2,0,Math.PI*.48),hair);hairMesh.position.y=3.02;hairMesh.castShadow=true;player.add(hairMesh);
+// face
+const eyeMat=mat(0x111827);
+for(const x of [-.19,.19]){const eye=new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),eyeMat);eye.position.set(x,2.79,-.55);player.add(eye)}
+// arms
+for(const x of [-.78,.78]){
+ const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.18,.85,6,10),shirt);arm.position.set(x,1.55,0);arm.rotation.z=x<0?-.12:.12;arm.castShadow=true;player.add(arm);
+ const hand=new THREE.Mesh(new THREE.SphereGeometry(.2,12,10),skin);hand.position.set(x*1.02,1.05,0);hand.castShadow=true;player.add(hand);
+}
+// legs and shoes
+for(const x of [-.32,.32]){
+ const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.22,.85,6,10),pants);leg.position.set(x,.55,0);leg.castShadow=true;player.add(leg);
+ const foot=new THREE.Mesh(new THREE.BoxGeometry(.42,.22,.72),shoe);foot.position.set(x,.12,-.12);foot.castShadow=true;player.add(foot);
+}
+// cap
+const cap=new THREE.Mesh(new THREE.CylinderGeometry(.64,.64,.18,20),mat(0x142d79));cap.position.y=3.38;cap.castShadow=true;player.add(cap);
+const visor=new THREE.Mesh(new THREE.BoxGeometry(.62,.08,.38),mat(0x0b1d52));visor.position.set(0,3.32,-.35);player.add(visor);
+
+player.position.set(-25,0,-25);scene.add(player);
+
+const eggs=[];
+const eggColors=[0xffd447,0x71e0ff,0xff77b7,0xb9ff6a,0xd79cff];
+function createEgg(x,z,i,owner='wild'){
+ const g=new THREE.Group();
+ const e=new THREE.Mesh(new THREE.SphereGeometry(.72,18,14),mat(eggColors[i%eggColors.length]));
+ e.scale.y=1.25;e.position.y=1.05;e.castShadow=true;g.add(e);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.9,.06,8,24),mat(0xffffff));
+ ring.rotation.x=Math.PI/2;ring.position.y=.18;g.add(ring);
+ g.position.set(x,0,z);g.userData={owner,value:25+i*20,held:false,home:{x,z}};scene.add(g);eggs.push(g);
+}
+createEgg(-18,-25,0,'wild');createEgg(-31,-25,1,'wild');createEgg(-25,-18,2,'wild');createEgg(25,25,3,'rival');createEgg(31,25,4,'rival');
+
+let money=150,level=1,stored=0,speed=7,capacity=1,boost=1,carrying=null,walkTime=0;
+const nameCanvas=document.createElement('canvas');nameCanvas.width=400;nameCanvas.height=90;
+const nctx=nameCanvas.getContext('2d');nctx.fillStyle='white';nctx.font='bold 42px Arial';nctx.textAlign='center';nctx.fillText('VOCÊ',200,55);
+const nameTex=new THREE.CanvasTexture(nameCanvas);const nameTag=new THREE.Sprite(new THREE.SpriteMaterial({map:nameTex,transparent:true}));
+nameTag.position.set(0,4.25,0);nameTag.scale.set(3.2,.72,1);player.add(nameTag);
+const keys={};addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+function say(t){const m=document.querySelector('#message');m.textContent=t;m.style.opacity=1;clearTimeout(say.t);say.t=setTimeout(()=>m.style.opacity=0,1700)}
+function dist(a,b){return Math.hypot(a.x-b.x,a.z-b.z)}
+function nearEgg(){let best=null,bd=3;for(const e of eggs){if(e.userData.held)continue;let d=dist(player.position,e.position);if(d<bd){bd=d;best=e}}return best}
+function steal(){
+ if(carrying){say('Você já está carregando um ovo! 🥚');return}
+ const e=nearEgg();if(!e){say('Chegue mais perto de um ovo!');return}
+ if(e.userData.owner==='rival'){say('🔥 Ovo raro roubado! Leve para sua base!');}
+ carrying=e;e.userData.held=true;e.visible=false;
+}
+function deposit(){
+ if(!carrying)return;
+ if(dist(player.position,new THREE.Vector3(-25,0,-25))<7){
+   stored++;money+=carrying.userData.value;document.querySelector('#money').textContent=money;document.querySelector('#eggs').textContent=stored;
+   say('🥚 Ovo guardado! +$'+carrying.userData.value);
+   carrying.visible=true;carrying.position.set(-25+((stored%3)-1)*3,0,-25+Math.floor((stored-1)/3)*2);
+   carrying.userData.held=false;carrying.userData.owner='player';carrying=null;updateUI();
+ }
+}
+function updateUI(){document.querySelector('#level').textContent=level;document.querySelector('#eggs').textContent=stored}
+
+const joy={x:0,y:0,active:false};
+const js=document.querySelector('#joystick'),st=document.querySelector('#stick');
+function setJoy(e){const r=js.getBoundingClientRect(),p=e.touches?e.touches[0]:e;let x=p.clientX-(r.left+r.width/2),y=p.clientY-(r.top+r.height/2);let l=Math.hypot(x,y),max=48;if(l>max){x=x/l*max;y=y/l*max}joy.x=x/max;joy.y=y/max;st.style.transform=`translate(${x}px,${y}px)`}
+js.addEventListener('pointerdown',e=>{joy.active=true;setJoy(e)});addEventListener('pointermove',e=>{if(joy.active)setJoy(e)});addEventListener('pointerup',()=>{joy.active=false;joy.x=joy.y=0;st.style.transform='translate(0,0)'});
+document.querySelector('#steal').onclick=steal;
+document.querySelector('#dash').onclick=()=>{boost=2.3;say('⚡ TURBO!');setTimeout(()=>boost=1,900)};
+document.querySelector('#shopBtn').onclick=()=>document.querySelector('#shop').style.display='flex';
+document.querySelector('#close').onclick=()=>document.querySelector('#shop').style.display='none';
+function buy(type,cost){
+ if(money<cost){say('Dinheiro insuficiente 💸');return}
+ money-=cost;
+ if(type==='speed')speed+=1.4;
+ if(type==='cap')capacity++;
+ if(type==='income')eggs.forEach(e=>e.userData.value+=8);
+ level++;updateUI();document.querySelector('#money').textContent=money;say('Upgrade comprado! ✨');renderShop()
+}
+function renderShop(){document.querySelector('#shopItems').innerHTML=`
+<div class="item">⚡ Velocidade <button onclick="buy('speed',100)">💰 100</button></div>
+<div class="item">🎒 Capacidade <button onclick="buy('cap',180)">💰 180</button></div>
+<div class="item">💎 Valor dos ovos <button onclick="buy('income',250)">💰 250</button></div>`}
+renderShop();
+
+const clock=new THREE.Clock();
+function animate(){
+ requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.05);
+ let ix=joy.x,iy=joy.y;
+ if(keys['w']||keys['arrowup'])iy=-1;if(keys['s']||keys['arrowdown'])iy=1;if(keys['a']||keys['arrowleft'])ix=-1;if(keys['d']||keys['arrowright'])ix=1;
+ const len=Math.hypot(ix,iy);if(len){ix/=len;iy/=len;player.position.x+=ix*speed*boost*dt;player.position.z+=iy*speed*boost*dt;player.rotation.y=Math.atan2(ix,iy);walkTime+=dt*10*boost;}else{walkTime+=dt*2}
+ torso.position.y=1.55+Math.sin(walkTime)*.025;
+ for(let i=0;i<player.children.length;i++){const c=player.children[i]; if(c.geometry && c.geometry.type==='CapsuleGeometry' && c!==body){ /* visual */ }}
+
+ player.position.x=Math.max(-39,Math.min(39,player.position.x));player.position.z=Math.max(-39,Math.min(39,player.position.z));
+ if(carrying){if(dist(player.position,new THREE.Vector3(-25,0,-25))<7)deposit()}
+ for(const e of eggs){if(e.userData.held)continue;e.rotation.y+=dt*.8;e.position.y=Math.sin(performance.now()/350+e.id)*.08}
+ const target=new THREE.Vector3(player.position.x,2.2,player.position.z+8);
+ const camTarget=new THREE.Vector3(player.position.x,1.7,player.position.z);
+ const camPos=new THREE.Vector3(player.position.x,6.2,player.position.z+9.5);
+ camera.position.lerp(camPos,.12);camera.lookAt(camTarget);
+ renderer.render(scene,camera);
+}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+animate();
+</script>
+</body></html>
