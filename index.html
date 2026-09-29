@@ -2,158 +2,2560 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Egg Pets</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Egg World</title>
 
 <style>
 *{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    user-select:none;
-    -webkit-user-select:none;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  user-select:none;
+  -webkit-user-select:none;
 }
 
 html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Arial,sans-serif;
-    background:#18251a;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111820;
+  font-family:Arial,sans-serif;
 }
 
 body{
-    touch-action:none;
+  touch-action:none;
 }
 
 button{
-    font-family:Arial,sans-serif;
+  font-family:Arial,sans-serif;
 }
 
 #game{
-    position:relative;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#75bd68;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+  background:#78b96a;
 }
 
 #world{
-    position:absolute;
-    width:3200px;
-    height:1900px;
-    transform-origin:0 0;
-    background:
-        radial-gradient(circle at 10% 20%,#ffffff18 0 2px,transparent 3px),
-        radial-gradient(circle at 30% 70%,#ffffff18 0 2px,transparent 3px),
-        radial-gradient(circle at 55% 25%,#ffffff18 0 2px,transparent 3px),
-        radial-gradient(circle at 80% 65%,#ffffff18 0 2px,transparent 3px),
-        #75bd68;
+  position:absolute;
+  width:3600px;
+  height:2200px;
+  background:
+    radial-gradient(circle at 20% 30%,#ffffff10 0 3px,transparent 4px),
+    radial-gradient(circle at 60% 70%,#ffffff10 0 3px,transparent 4px),
+    radial-gradient(circle at 80% 20%,#ffffff10 0 3px,transparent 4px),
+    #78b96a;
 }
 
-/* ESTRADAS */
+/* MAPA */
+
+.water{
+  position:absolute;
+  background:#55aee8;
+  border:10px solid #367ea8;
+  border-radius:45px;
+  box-shadow:inset 0 0 0 5px #ffffff33;
+}
 
 .road{
-    position:absolute;
-    background:#c8aa76;
-    border-top:10px solid #92764a;
-    border-bottom:10px solid #92764a;
+  position:absolute;
+  background:#c8a872;
+  border:8px solid #927449;
+  border-radius:25px;
 }
 
-.road.horizontal{
-    left:0;
-    top:870px;
-    width:3200px;
-    height:150px;
+.tree{
+  position:absolute;
+  width:60px;
+  height:75px;
 }
 
-.road.vertical{
-    left:600px;
-    top:0;
-    width:130px;
-    height:1900px;
+.tree:before{
+  content:"";
+  position:absolute;
+  left:24px;
+  top:38px;
+  width:13px;
+  height:35px;
+  background:#704726;
+  border-radius:5px;
+}
+
+.tree:after{
+  content:"";
+  position:absolute;
+  left:3px;
+  top:0;
+  width:54px;
+  height:54px;
+  background:#2f7d3c;
+  border:5px solid #24642f;
+  border-radius:50%;
+}
+
+.rock{
+  position:absolute;
+  width:48px;
+  height:32px;
+  background:#777;
+  border:4px solid #555;
+  border-radius:50%;
 }
 
 /* BASE */
 
 #base{
-    position:absolute;
-    left:110px;
-    top:680px;
-    width:430px;
-    height:430px;
-    background:#b9df8b;
-    border:10px solid #744b28;
-    border-radius:35px;
-    box-shadow:0 12px 0 #0003;
+  position:absolute;
+  left:120px;
+  top:820px;
+  width:430px;
+  height:410px;
+  background:#d8c49a;
+  border:10px solid #69482b;
+  border-radius:35px;
+  box-shadow:0 14px 0 #0003;
 }
 
-.baseFence{
-    position:absolute;
-    inset:-20px;
-    border:8px dashed #996733;
-    border-radius:45px;
-    pointer-events:none;
+#base:after{
+  content:"";
+  position:absolute;
+  inset:-22px;
+  border:8px dashed #8b673d;
+  border-radius:50px;
+  pointer-events:none;
 }
 
-#base h1{
-    text-align:center;
-    margin-top:18px;
-    color:#29421f;
-    font-size:29px;
+.baseTitle{
+  text-align:center;
+  color:#49351f;
+  padding-top:18px;
+  font-size:30px;
+  font-weight:900;
 }
 
-.baseSubtitle{
-    text-align:center;
-    color:#314a27;
-    font-weight:bold;
-    margin-top:5px;
+.baseSub{
+  text-align:center;
+  color:#654c31;
+  font-weight:bold;
+  font-size:13px;
+  margin-top:5px;
 }
 
-#eggSlots{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:13px;
-    padding:28px;
+#slots{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:22px;
 }
 
 .slot{
-    height:125px;
-    background:#ffffff88;
-    border:4px solid #80633e;
-    border-radius:18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    font-size:42px;
+  height:120px;
+  border:4px solid #846445;
+  background:#ffffff66;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  font-size:39px;
 }
 
 .slot small{
-    position:absolute;
-    bottom:7px;
-    font-size:11px;
-    color:#222;
-    text-align:center;
+  position:absolute;
+  bottom:6px;
+  font-size:10px;
+  color:#49351f;
 }
 
-.slot button{
-    position:absolute;
-    bottom:8px;
-    background:#1687d9;
-    color:white;
-    border:0;
-    padding:5px 8px;
-    border-radius:7px;
-    font-size:10px;
+.openBtn{
+  position:absolute;
+  bottom:7px;
+  background:#167ed0;
+  color:white;
+  border:0;
+  border-radius:7px;
+  padding:5px 8px;
+  font-size:10px;
 }
 
 /* ÁREAS */
 
 .area{
-    position:absolute;
-    width:410px;
-    height:330px;
-    border:10px solid #493528;
-    border-radius:40px;
-    box-shadow:0 10px 0 #0003
+  position:absolute;
+  width:470px;
+  height:360px;
+  border:10px solid #47362a;
+  border-radius:42px;
+  box-shadow:0 12px 0 #0003;
+}
+
+.area h2{
+  position:absolute;
+  left:50%;
+  top:16px;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  background:#18202de8;
+  color:white;
+  padding:12px 20px;
+  border-radius:15px;
+  text-align:center;
+  font-size:23px;
+  z-index:5;
+}
+
+.area h2 small{
+  display:block;
+  font-size:11px;
+  margin-top:5px;
+}
+
+#chickenArea{
+  left:930px;
+  top:360px;
+  background:#dfc99a;
+}
+
+#tigerArea{
+  left:1650px;
+  top:980px;
+  background:#d78843;
+}
+
+#gorillaArea{
+  left:2760px;
+  top:330px;
+  background:#69656d;
+}
+
+.animal{
+  position:absolute;
+  left:50%;
+  top:57%;
+  transform:translate(-50%,-50%);
+  font-size:92px;
+  filter:drop-shadow(0 7px 3px #0005);
+}
+
+/* OVOS */
+
+.egg{
+  position:absolute;
+  width:72px;
+  height:86px;
+  border-radius:50% 50% 45% 45%;
+  border:5px solid #493c34;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  z-index:6;
+  box-shadow:0 7px 0 #0004;
+  cursor:pointer;
+}
+
+.common{background:#f5f5f5}
+.uncommon{background:#55c96a}
+.rare{background:#55a7f2}
+.mythic{background:#ef5555}
+.legendary{background:#ffd83d}
+.secret{background:#ad59e8}
+
+/* PLAYER */
+
+#player{
+  position:absolute;
+  width:54px;
+  height:72px;
+  z-index:20;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+
+.head{
+  position:absolute;
+  left:12px;
+  top:0;
+  width:30px;
+  height:30px;
+  background:#f1c27d;
+  border:3px solid #6d4a2b;
+  border-radius:7px;
+}
+
+.body{
+  position:absolute;
+  left:9px;
+  top:29px;
+  width:36px;
+  height:29px;
+  background:#2e73d1;
+  border:3px solid #19467f;
+  border-radius:7px;
+}
+
+.leg{
+  position:absolute;
+  top:56px;
+  width:13px;
+  height:16px;
+  background:#333;
+  border-radius:4px;
+}
+
+.l{left:11px}
+.r{right:11px}
+
+#carried{
+  position:absolute;
+  z-index:21;
+  display:none;
+  font-size:38px;
+  transform:translate(-50%,-100%);
+  filter:drop-shadow(0 5px 2px #0005);
+}
+
+/* INTERFACE */
+
+#ui{
+  position:fixed;
+  left:0;
+  right:0;
+  top:0;
+  z-index:50;
+  pointer-events:none;
+}
+
+#topbar{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:10px;
+}
+
+.badge{
+  background:#162333e8;
+  color:white;
+  border:2px solid #ffffff22;
+  border-radius:12px;
+  padding:8px 11px;
+  font-weight:bold;
+  font-size:13px;
+  box-shadow:0 5px 12px #0003;
+}
+
+#topBtns{
+  margin-left:auto;
+  display:flex;
+  gap:7px;
+  pointer-events:auto;
+}
+
+.uiBtn{
+  border:0;
+  border-radius:12px;
+  padding:9px 11px;
+  background:#ffffffea;
+  color:#17202a;
+  font-weight:900;
+}
+
+/* ANALÓGICO */
+
+#joystick{
+  position:fixed;
+  left:24px;
+  bottom:25px;
+  width:145px;
+  height:145px;
+  border-radius:50%;
+  background:#0005;
+  border:4px solid #ffffff55;
+  z-index:60;
+  pointer-events:auto;
+}
+
+#stick{
+  position:absolute;
+  left:38px;
+  top:38px;
+  width:69px;
+  height:69px;
+  border-radius:50%;
+  background:#ffffffb8;
+  border:5px solid #ffffff88;
+}
+
+/* BOTÃO PULO */
+
+#jump{
+  position:fixed;
+  right:25px;
+  bottom:35px;
+  width:90px;
+  height:90px;
+  border:0;
+  border-radius:50%;
+  background:#2f8fe8;
+  color:white;
+  font-size:28px;
+  font-weight:900;
+  z-index:60;
+  box-shadow:0 7px 0 #1b5e9a;
+}
+
+/* BOTÃO OVO */
+
+#action{
+  position:fixed;
+  right:125px;
+  bottom:50px;
+  background:#f5a623;
+  color:white;
+  border:0;
+  border-radius:16px;
+  padding:14px 17px;
+  font-weight:900;
+  z-index:60;
+  display:none;
+  box-shadow:0 5px 0 #a66d10;
+}
+
+/* TIMER */
+
+#timer{
+  position:fixed;
+  left:50%;
+  top:120px;
+  transform:translateX(-50%);
+  z-index:55;
+  background:#c83c3c;
+  color:white;
+  padding:9px 15px;
+  border-radius:12px;
+  font-weight:900;
+  display:none;
+}
+
+/* MODAL */
+
+#modalShade{
+  position:fixed;
+  inset:0;
+  background:#0009;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modal{
+  width:min(520px,95vw);
+  max-height:88vh;
+  overflow:auto;
+  background:#f5f0e8;
+  border:5px solid #553c25;
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 15px 40px #0008;
+}
+
+.modal h2{
+  margin-bottom:12px;
+  color:#35271c;
+}
+
+.modal p{
+  margin:7px 0;
+  color:#4c3c2d;
+}
+
+.close{
+  float:right;
+  border:0;
+  background:#d9534f;
+  color:white;
+  border-radius:8px;
+  padding:5px 9px;
+  font-weight:bold;
+}
+
+.shopGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:12px;
+}
+
+.shopItem{
+  background:white;
+  border:2px solid #d4c7b7;
+  border-radius:12px;
+  padding:11px;
+}
+
+.shopItem button,
+.adminAction{
+  width:100%;
+  margin-top:7px;
+  border:0;
+  border-radius:8px;
+  padding:9px;
+  background:#2479d1;
+  color:white;
+  font-weight:bold;
+}
+
+.adminAction.red{
+  background:#c74343;
+}
+
+.select{
+  width:100%;
+  padding:10px;
+  border-radius:9px;
+  border:2px solid #bbb;
+  margin:7px 0;
+}
+
+.progress{
+  height:8px;
+  background:#ddd;
+  border-radius:9px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progress i{
+  display:block;
+  height:100%;
+  width:0;
+  background:#2f8fe8;
+}
+
+#toast{
+  position:fixed;
+  left:50%;
+  top:82px;
+  transform:translateX(-50%);
+  z-index:150;
+  background:#162333f0;
+  color:white;
+  padding:11px 15px;
+  border-radius:12px;
+  display:none;
+  font-weight:bold;
+  box-shadow:0 7px 20px #0005;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  .badge{
+    font-size:11px;
+    padding:7px 8px;
+  }
+
+  .uiBtn{
+    font-size:10px;
+    padding:8px;
+  }
+
+  #joystick{
+    width:130px;
+    height:130px;
+  }
+
+  #jump{
+    width:78px;
+    height:78px;
+    right:20px;
+  }
+
+  #action{
+    right:105px;
+    bottom:43px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<div id="world">
+
+<!-- ÁGUA -->
+<div class="water" style="left:620px;top:120px;width:260px;height:360px"></div>
+<div class="water" style="left:1980px;top:240px;width:430px;height:190px"></div>
+<div class="water" style="left:1200px;top:1450px;width:500px;height:270px"></div>
+
+<!-- ESTRADAS -->
+<div class="road" style="left:0;top:1000px;width:3600px;height:150px"></div>
+<div class="road" style="left:600px;top:0;width:130px;height:2200px"></div>
+<div class="road" style="left:1100px;top:650px;width:1200px;height:100px"></div>
+<div class="road" style="left:2380px;top:650px;width:1000px;height:100px"></div>
+
+<!-- BASE -->
+<div id="base">
+
+<div class="baseTitle">
+🏠 SUA BASE
+</div>
+
+<div class="baseSub">
+Leve os ovos para cá e abra!
+</div>
+
+<div id="slots"></div>
+
+</div>
+
+<!-- ÁREA GALINHA -->
+<div class="area" id="chickenArea">
+
+<h2>
+🐔 GALINHA
+<small>Velocidade mínima: 1</small>
+</h2>
+
+<div class="animal">🐔</div>
+
+</div>
+
+<!-- ÁREA TIGRE -->
+<div class="area" id="tigerArea">
+
+<h2>
+🐯 TIGRE
+<small>Velocidade mínima: 10</small>
+</h2>
+
+<div class="animal">🐯</div>
+
+</div>
+
+<!-- ÁREA GORILA -->
+<div class="area" id="gorillaArea">
+
+<h2>
+🦍 GORILA
+<small>Velocidade mínima: 30</small>
+</h2>
+
+<div class="animal">🦍</div>
+
+</div>
+
+<!-- ÁRVORES -->
+<div class="tree" style="left:760px;top:570px"></div>
+<div class="tree" style="left:820px;top:1280px"></div>
+<div class="tree" style="left:1420px;top:250px"></div>
+<div class="tree" style="left:1500px;top:1380px"></div>
+<div class="tree" style="left:2500px;top:250px"></div>
+<div class="tree" style="left:2600px;top:1500px"></div>
+<div class="tree" style="left:3200px;top:500px"></div>
+<div class="tree" style="left:3300px;top:1250px"></div>
+
+<!-- PEDRAS -->
+<div class="rock" style="left:700px;top:1500px"></div>
+<div class="rock" style="left:1300px;top:500px"></div>
+<div class="rock" style="left:2200px;top:1250px"></div>
+<div class="rock" style="left:3000px;top:1200px"></div>
+
+<!-- OVOS -->
+<div id="eggLayer"></div>
+
+<!-- JOGADOR -->
+<div id="player">
+
+<div class="head"></div>
+<div class="body"></div>
+<div class="leg l"></div>
+<div class="leg r"></div>
+
+</div>
+
+<!-- OVO CARREGADO -->
+<div id="carried">🥚</div>
+
+</div>
+</div>
+
+<!-- INTERFACE -->
+
+<div id="ui">
+
+<div id="topbar">
+
+<div class="badge">
+💰 <span id="money">0</span>
+</div>
+
+<div class="badge">
+⚡ Nv. <span id="speedLevel">1</span>
+</div>
+
+<div class="badge">
+👟 <span id="trailName">Nenhuma</span>
+</div>
+
+<div id="topBtns">
+
+<button class="uiBtn" id="speedShopBtn">
+⚡ Loja
+</button>
+
+<button class="uiBtn" id="trailShopBtn">
+👟 Trilhas
+</button>
+
+<button class="uiBtn" id="adminBtn">
+🔐 DM
+</button>
+
+</div>
+
+</div>
+</div>
+
+<!-- TIMER -->
+<div id="timer"></div>
+
+<!-- PEGAR OVO -->
+<button id="action">
+🥚 Pegar ovo
+</button>
+
+<!-- ANALÓGICO -->
+<div id="joystick">
+<div id="stick"></div>
+</div>
+
+<!-- PULO -->
+<button id="jump">
+⬆️
+</button>
+
+<!-- AVISO -->
+<div id="toast"></div>
+
+<!-- MODAL -->
+<div id="modalShade">
+<div class="modal" id="modal"></div>
+</div>
+
+<script>
+
+"use strict";
+
+/* =========================
+   CONFIGURAÇÕES
+========================= */
+
+const ADMIN_PASSWORD="REX-7391";
+
+const world=document.getElementById("world");
+const playerEl=document.getElementById("player");
+const carriedEl=document.getElementById("carried");
+const eggLayer=document.getElementById("eggLayer");
+const actionBtn=document.getElementById("action");
+const timerEl=document.getElementById("timer");
+const modalShade=document.getElementById("modalShade");
+const modal=document.getElementById("modal");
+const toast=document.getElementById("toast");
+
+const state={
+
+x:300,
+y:1020,
+
+vx:0,
+vy:0,
+
+jumpY:0,
+
+money:500,
+
+speedLevel:1,
+
+trail:null,
+
+carried:null,
+
+baseEggs:[],
+
+eggs:[],
+
+nextId:1,
+
+last:performance.now(),
+
+joystickX:0,
+joystickY:0
+
+};
+
+
+/* =========================
+   RARIDADES
+========================= */
+
+const rarity={
+
+common:{
+name:"Comum",
+cls:"common",
+emoji:"⚪",
+open:1,
+reward:25
+},
+
+uncommon:{
+name:"Incomum",
+cls:"uncommon",
+emoji:"🟢",
+open:2,
+reward:60
+},
+
+rare:{
+name:"Raro",
+cls:"rare",
+emoji:"🔵",
+open:5,
+reward:140
+},
+
+mythic:{
+name:"Mítico",
+cls:"mythic",
+emoji:"🔴",
+open:10,
+reward:400
+},
+
+legendary:{
+name:"Lendário",
+cls:"legendary",
+emoji:"🟡",
+open:30,
+reward:900
+},
+
+secret:{
+name:"Secreto",
+cls:"secret",
+emoji:"🟣",
+open:120,
+reward:5000
+}
+
+};
+
+
+/* =========================
+   ÁREAS
+========================= */
+
+const areaData={
+
+chicken:{
+x:930,
+y:360,
+min:1,
+types:["common","uncommon","rare"]
+},
+
+tiger:{
+x:1650,
+y:980,
+min:10,
+types:["uncommon","rare","mythic","legendary"]
+},
+
+gorilla:{
+x:2760,
+y:330,
+min:30,
+types:["rare","mythic","legendary","secret"]
+}
+
+};
+
+
+/* =========================
+   PREÇOS VELOCIDADE
+========================= */
+
+const speedCosts=[];
+
+for(let i=2;i<=30;i++){
+
+speedCosts[i]=Math.round(
+100*Math.pow(1.22,i-2)
+);
+
+}
+
+
+/* =========================
+   TRILHAS
+========================= */
+
+const trails=[
+
+{
+name:"Vermelha",
+mult:1.5,
+cost:150,
+icon:"🔴"
+},
+
+{
+name:"Roxa",
+mult:2.5,
+cost:700,
+icon:"🟣"
+},
+
+{
+name:"Azul",
+mult:5,
+cost:2500,
+icon:"🔵"
+},
+
+{
+name:"Verde",
+mult:10,
+cost:9000,
+icon:"🟢"
+},
+
+{
+name:"Amarela",
+mult:15,
+cost:25000,
+icon:"🟡"
+}
+
+];
+
+
+/* =========================
+   FUNÇÕES BÁSICAS
+========================= */
+
+function fmt(n){
+
+return Math.floor(n).toLocaleString("pt-BR");
+
+}
+
+function showToast(text){
+
+toast.textContent=text;
+
+toast.style.display="block";
+
+clearTimeout(showToast.timer);
+
+showToast.timer=setTimeout(()=>{
+
+toast.style.display="none";
+
+},2300);
+
+}
+
+function openModal(html){
+
+modal.innerHTML=html;
+
+modalShade.style.display="flex";
+
+}
+
+function closeModal(){
+
+modalShade.style.display="none";
+
+}
+
+function distance(a,b){
+
+return Math.hypot(
+a.x-b.x,
+a.y-b.y
+);
+
+}
+
+
+/* =========================
+   VELOCIDADE
+========================= */
+
+function baseSpeed(){
+
+return 85+(state.speedLevel-1)*8;
+
+}
+
+function multiplier(){
+
+return state.trail?
+state.trail.mult:
+1;
+
+}
+
+function actualSpeed(){
+
+return baseSpeed()*multiplier();
+
+}
+
+
+/* =========================
+   INTERFACE
+========================= */
+
+function updateUI(){
+
+document.getElementById("money").textContent=
+fmt(state.money);
+
+document.getElementById("speedLevel").textContent=
+state.speedLevel;
+
+document.getElementById("trailName").textContent=
+state.trail?
+state.trail.icon+" "+state.trail.name:
+"Nenhuma";
+
+renderSlots();
+
+}
+
+
+/* =========================
+   SLOTS DA BASE
+========================= */
+
+function renderSlots(){
+
+const box=document.getElementById("slots");
+
+box.innerHTML="";
+
+for(let i=0;i<4;i++){
+
+const slot=document.createElement("div");
+
+slot.className="slot";
+
+if(state.baseEggs[i]){
+
+const e=state.baseEggs[i];
+
+const r=rarity[e.type];
+
+slot.innerHTML=`
+
+${r.emoji}
+
+<small>
+${r.name}
+</small>
+
+<button class="openBtn">
+ABRIR
+</button>
+
+`;
+
+slot.querySelector("button").onclick=()=>{
+
+openEgg(i);
+
+};
+
+}else{
+
+slot.innerHTML=`
+
+🥚
+
+<small>
+Espaço vazio
+</small>
+
+`;
+
+}
+
+box.appendChild(slot);
+
+}
+
+}
+
+
+/* =========================
+   CRIAR OVO
+========================= */
+
+function createEgg(area,type,forced=false){
+
+const data=areaData[area];
+
+if(!data)return;
+
+const r=rarity[type];
+
+const el=document.createElement("div");
+
+el.className=
+"egg "+r.cls;
+
+el.textContent=r.emoji;
+
+const angle=
+Math.random()*Math.PI*2;
+
+const radius=
+75+Math.random()*85;
+
+const x=
+data.x+
+235+
+Math.cos(angle)*radius;
+
+const y=
+data.y+
+180+
+Math.sin(angle)*radius;
+
+el.style.left=x+"px";
+
+el.style.top=y+"px";
+
+eggLayer.appendChild(el);
+
+const egg={
+
+id:state.nextId++,
+area,
+type,
+x,
+y,
+el,
+forced
+
+};
+
+state.eggs.push(egg);
+
+el.onclick=()=>{
+
+tryPickup(egg);
+
+};
+
+return egg;
+
+}
+
+
+/* =========================
+   REMOVER OVO
+========================= */
+
+function removeEgg(egg){
+
+if(
+egg.el &&
+egg.el.parentNode
+){
+
+egg.el.remove();
+
+}
+
+state.eggs=
+state.eggs.filter(e=>e!==egg);
+
+}
+
+
+/* =========================
+   OVO NORMAL
+========================= */
+
+function naturalEgg(area){
+
+const roll=Math.random();
+
+if(area==="chicken"){
+
+if(roll<0.55)
+return "common";
+
+if(roll<0.85)
+return "uncommon";
+
+return "rare";
+
+}
+
+if(area==="tiger"){
+
+if(roll<0.35)
+return "uncommon";
+
+if(roll<0.65)
+return "rare";
+
+if(roll<0.88)
+return "mythic";
+
+return "legendary";
+
+}
+
+if(roll<0.32)
+return "rare";
+
+if(roll<0.62)
+return "mythic";
+
+if(roll<0.88)
+return "legendary";
+
+return "secret";
+
+}
+
+
+function spawnNatural(area){
+
+createEgg(
+area,
+naturalEgg(area),
+false
+);
+
+}
+
+
+/* =========================
+   CHANCES NORMAIS
+   A CADA 5 MINUTOS
+========================= */
+
+function specialChance(){
+
+const roll=Math.random();
+
+/* 10% secreto */
+
+if(roll<0.10){
+
+return "secret";
+
+}
+
+/* 30% mítico */
+
+if(roll<0.40){
+
+return "mythic";
+
+}
+
+return null;
+
+}
+
+
+function spawnSpecialNaturally(){
+
+const type=specialChance();
+
+if(!type)return;
+
+const areas=[
+"chicken",
+"tiger",
+"gorilla"
+];
+
+const area=
+areas[
+Math.floor(
+Math.random()*areas.length
+)
+];
+
+createEgg(
+area,
+type,
+false
+);
+
+showToast(
+"✨ Um ovo "+
+rarity[type].name+
+" apareceu!"
+);
+
+}
+
+
+/* =========================
+   ENCONTRAR OVO
+========================= */
+
+function nearestEgg(){
+
+let best=null;
+
+let bestDistance=125;
+
+for(const egg of state.eggs){
+
+const d=distance(
+{x:state.x,y:state.y},
+{x:egg.x,y:egg.y}
+);
+
+if(d<bestDistance){
+
+bestDistance=d;
+best=egg;
+
+}
+
+}
+
+return best;
+
+}
+
+
+/* =========================
+   PEGAR OVO
+========================= */
+
+function tryPickup(egg){
+
+if(state.carried){
+
+showToast(
+"Você já está carregando um ovo!"
+);
+
+return;
+
+}
+
+const requirement=
+areaData[egg.area].min;
+
+if(state.speedLevel<requirement){
+
+showToast(
+"Você precisa de velocidade "+
+requirement+
+" para essa área."
+);
+
+return;
+
+}
+
+if(
+distance(
+{x:state.x,y:state.y},
+{x:egg.x,y:egg.y}
+)>145
+){
+
+showToast(
+"Chegue mais perto do ovo."
+);
+
+return;
+
+}
+
+state.carried={
+...egg,
+started:performance.now()
+};
+
+removeEgg(egg);
+
+carriedEl.style.display="block";
+
+startCarryTimer();
+
+showToast(
+"🥚 Ovo pego! Volte para a base!"
+);
+
+}
+
+
+/* =========================
+   TEMPO DO OVO
+========================= */
+
+function startCarryTimer(){
+
+if(!state.carried)return;
+
+const e=state.carried;
+
+const baseTime={
+
+common:22,
+uncommon:25,
+rare:30,
+mythic:38,
+legendary:50,
+secret:70
+
+}[e.type]||30;
+
+/*
+Quanto maior a velocidade,
+mais tempo prático o jogador possui.
+*/
+
+const speedBonus=
+1+(state.speedLevel-1)*0.035;
+
+const trailBonus=
+state.trail?
+1+Math.min(
+state.trail.mult,
+15
+)*0.025:
+1;
+
+e.deadline=
+performance.now()+
+baseTime*
+speedBonus*
+trailBonus*
+1000;
+
+timerEl.style.display="block";
+
+}
+
+
+function updateCarry(){
+
+if(!state.carried)return;
+
+const remain=
+Math.max(
+0,
+state.carried.deadline-
+performance.now()
+);
+
+timerEl.textContent=
+"🥚 Tempo: "+
+Math.ceil(remain/1000)+
+"s";
+
+if(remain<=0){
+
+showToast(
+"💨 Você perdeu o ovo!"
+);
+
+state.carried=null;
+
+carriedEl.style.display="none";
+
+timerEl.style.display="none";
+
+}
+
+}
+
+
+/* =========================
+   COLOCAR OVO NA BASE
+========================= */
+
+function depositAtBase(){
+
+if(!state.carried)return;
+
+const inside=
+state.x>120 &&
+state.x<550 &&
+state.y>820 &&
+state.y<1230;
+
+if(!inside)return;
+
+if(state.baseEggs.length>=4){
+
+showToast(
+"A base já está cheia!"
+);
+
+return;
+
+}
+
+const egg=state.carried;
+
+state.baseEggs.push({
+
+type:egg.type,
+area:egg.area
+
+});
+
+state.carried=null;
+
+carriedEl.style.display="none";
+
+timerEl.style.display="none";
+
+updateUI();
+
+showToast(
+"✅ Ovo levado para a base!"
+);
+
+}
+
+
+/* =========================
+   ABRIR OVO
+========================= */
+
+function openEgg(index){
+
+const egg=
+state.baseEggs[index];
+
+if(!egg)return;
+
+const r=
+rarity[egg.type];
+
+const timeText=
+r.open>=60?
+(r.open/60)+" minuto(s)":
+r.open+" segundo(s)";
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+${r.emoji}
+Abrindo ovo ${r.name}
+</h2>
+
+<p>
+Tempo:
+<b>${timeText}</b>
+</p>
+
+<div class="progress">
+<i id="openProgress"></i>
+</div>
+
+<p id="openText">
+Preparando...
+</p>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+const start=performance.now();
+
+const duration=
+r.open*1000;
+
+function opening(){
+
+if(
+modalShade.style.display==="none"
+)return;
+
+const progress=
+Math.min(
+1,
+(performance.now()-start)/
+duration
+);
+
+document.getElementById(
+"openProgress"
+).style.width=
+(progress*100)+"%";
+
+if(progress<1){
+
+document.getElementById(
+"openText"
+).textContent=
+"Abrindo...";
+
+requestAnimationFrame(opening);
+
+return;
+
+}
+
+state.baseEggs.splice(
+index,
+1
+);
+
+state.money+=r.reward;
+
+updateUI();
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+🎉 Pet conseguido!
+</h2>
+
+<p>
+Você conseguiu um pet
+<b>${r.name}</b>!
+</p>
+
+<p>
+💰 Recompensa:
+<b>${fmt(r.reward)}</b>
+</p>
+
+<button class="adminAction" id="ok">
+OK
+</button>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+document.getElementById("ok").onclick=
+closeModal;
+
+}
+
+requestAnimationFrame(opening);
+
+}
+
+
+/* =========================
+   LOJA DE VELOCIDADE
+========================= */
+
+function speedShop(){
+
+let items="";
+
+items+=`
+
+<div class="shopItem">
+
+<b>
+Velocidade atual:
+${state.speedLevel}
+</b>
+
+<p>
+Máximo: 30
+</p>
+
+</div>
+
+`;
+
+for(
+let i=state.speedLevel+1;
+i<=Math.min(30,state.speedLevel+5);
+i++
+){
+
+items+=`
+
+<div class="shopItem">
+
+<b>
+⚡ Velocidade ${i}
+</b>
+
+<p>
+💰 ${fmt(speedCosts[i])}
+</p>
+
+<button data-speed="${i}">
+Comprar
+</button>
+
+</div>
+
+`;
+
+}
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+⚡ Loja de Velocidade
+</h2>
+
+<p>
+Compre velocidade de 1 até 30.
+</p>
+
+<div class="shopGrid">
+${items}
+</div>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+modal.querySelectorAll("[data-speed]")
+.forEach(button=>{
+
+button.onclick=()=>{
+
+const level=
+Number(button.dataset.speed);
+
+if(
+level!==state.speedLevel+1
+){
+
+showToast(
+"Compre as velocidades em ordem."
+);
+
+return;
+
+}
+
+if(
+state.money<
+speedCosts[level]
+){
+
+showToast(
+"Dinheiro insuficiente."
+);
+
+return;
+
+}
+
+state.money-=
+speedCosts[level];
+
+state.speedLevel=
+level;
+
+updateUI();
+
+speedShop();
+
+showToast(
+"⚡ Velocidade aumentada!"
+);
+
+};
+
+});
+
+}
+
+
+/* =========================
+   LOJA DE TRILHAS
+========================= */
+
+function trailShop(){
+
+const items=
+trails.map(
+(t,index)=>`
+
+<div class="shopItem">
+
+<b>
+${t.icon}
+Trilha ${t.name}
+</b>
+
+<p>
+${t.mult}× velocidade
+</p>
+
+<p>
+💰 ${fmt(t.cost)}
+</p>
+
+<button data-trail="${index}">
+${
+state.trail===t?
+"Equipado":
+"Comprar"
+}
+</button>
+
+</div>
+
+`
+).join("");
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+👟 Loja de Trilhas
+</h2>
+
+<p>
+As trilhas são separadas da loja de velocidade.
+</p>
+
+<div class="shopGrid">
+${items}
+</div>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+modal.querySelectorAll("[data-trail]")
+.forEach(button=>{
+
+button.onclick=()=>{
+
+const trail=
+trails[
+Number(button.dataset.trail)
+];
+
+if(state.trail===trail){
+
+showToast(
+"Essa trilha já está equipada."
+);
+
+return;
+
+}
+
+if(
+state.money<trail.cost
+){
+
+showToast(
+"Dinheiro insuficiente."
+);
+
+return;
+
+}
+
+state.money-=trail.cost;
+
+state.trail=trail;
+
+updateUI();
+
+trailShop();
+
+showToast(
+"👟 Trilha equipada!"
+);
+
+};
+
+});
+
+}
+
+
+/* =========================
+   PAINEL DA DM
+========================= */
+
+function adminPanel(){
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+🔐 Painel da DM
+</h2>
+
+<p>
+Os spawns do painel são
+<b>100% garantidos</b>.
+</p>
+
+<select class="select" id="adminArea">
+
+<option value="chicken">
+🐔 Galinha
+</option>
+
+<option value="tiger">
+🐯 Tigre
+</option>
+
+<option value="gorilla">
+🦍 Gorila
+</option>
+
+</select>
+
+<button class="adminAction red" id="spawnMythic">
+🔴 Spawnar Mítico — 100%
+</button>
+
+<button class="adminAction red" id="spawnSecret">
+🟣 Spawnar Secreto — 100%
+</button>
+
+<hr style="margin:15px 0">
+
+<input
+class="select"
+id="giveMoney"
+type="number"
+min="1"
+placeholder="Quantidade de dinheiro"
+>
+
+<button class="adminAction" id="give">
+💰 Dar dinheiro
+</button>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+const getArea=()=>
+document.getElementById("adminArea").value;
+
+
+/* MÍTICO — SEM CHANCE, SEM ALEATORIEDADE */
+
+document.getElementById("spawnMythic")
+.onclick=()=>{
+
+createEgg(
+getArea(),
+"mythic",
+true
+);
+
+showToast(
+"🔴 Ovo Mítico spawnado! 100%!"
+);
+
+};
+
+
+/* SECRETO — SEM CHANCE, SEM ALEATORIEDADE */
+
+document.getElementById("spawnSecret")
+.onclick=()=>{
+
+createEgg(
+getArea(),
+"secret",
+true
+);
+
+showToast(
+"🟣 Ovo Secreto spawnado! 100%!"
+);
+
+};
+
+
+/* DAR DINHEIRO */
+
+document.getElementById("give")
+.onclick=()=>{
+
+const amount=
+Number(
+document.getElementById("giveMoney").value
+)||0;
+
+if(amount<=0){
+
+showToast(
+"Digite uma quantidade válida."
+);
+
+return;
+
+}
+
+state.money+=amount;
+
+updateUI();
+
+showToast(
+"💰 Dinheiro adicionado!"
+);
+
+};
+
+}
+
+
+/* =========================
+   LOGIN DM
+========================= */
+
+function adminLogin(){
+
+openModal(`
+
+<button class="close" id="close">
+X
+</button>
+
+<h2>
+🔐 Painel da DM
+</h2>
+
+<p>
+Digite a senha:
+</p>
+
+<input
+class="select"
+id="pass"
+type="password"
+placeholder="Senha"
+>
+
+<button class="adminAction" id="login">
+Entrar
+</button>
+
+`);
+
+document.getElementById("close").onclick=
+closeModal;
+
+document.getElementById("login")
+.onclick=()=>{
+
+if(
+document.getElementById("pass").value===
+ADMIN_PASSWORD
+){
+
+adminPanel();
+
+}else{
+
+showToast(
+"Senha incorreta."
+);
+
+}
+
+};
+
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+document.getElementById(
+"speedShopBtn"
+).onclick=speedShop;
+
+document.getElementById(
+"trailShopBtn"
+).onclick=trailShop;
+
+document.getElementById(
+"adminBtn"
+).onclick=adminLogin;
+
+modalShade.addEventListener(
+"click",
+e=>{
+
+if(e.target===modalShade){
+
+closeModal();
+
+}
+
+});
+
+
+/* =========================
+   ANALÓGICO
+========================= */
+
+let joyActive=false;
+
+const joystick=
+document.getElementById("joystick");
+
+const stick=
+document.getElementById("stick");
+
+
+function setJoystick(x,y){
+
+const rect=
+joystick.getBoundingClientRect();
+
+const centerX=
+rect.left+rect.width/2;
+
+const centerY=
+rect.top+rect.height/2;
+
+let dx=x-centerX;
+let dy=y-centerY;
+
+const max=
+rect.width*0.32;
+
+const length=
+Math.hypot(dx,dy);
+
+if(length>max){
+
+dx=
+dx/length*max;
+
+dy=
+dy/length*max;
+
+}
+
+state.joystickX=
+dx/max;
+
+state.joystickY=
+dy/max;
+
+stick.style.transform=
+`translate(${dx}px,${dy}px)`;
+
+}
+
+
+function resetJoystick(){
+
+joyActive=false;
+
+state.joystickX=0;
+state.joystickY=0;
+
+stick.style.transform=
+"translate(0,0)";
+
+}
+
+
+joystick.addEventListener(
+"pointerdown",
+event=>{
+
+joyActive=true;
+
+joystick.setPointerCapture(
+event.pointerId
+);
+
+setJoystick(
+event.clientX,
+event.clientY
+);
+
+}
+);
+
+joystick.addEventListener(
+"pointermove",
+event=>{
+
+if(joyActive){
+
+setJoystick(
+event.clientX,
+event.clientY
+);
+
+}
+
+}
+);
+
+joystick.addEventListener(
+"pointerup",
+resetJoystick
+);
+
+joystick.addEventListener(
+"pointercancel",
+resetJoystick
+);
+
+
+/* =========================
+   PULO
+========================= */
+
+let jump=0;
+
+document.getElementById(
+"jump"
+).addEventListener(
+"pointerdown",
+()=>{
+
+if(jump<=0){
+
+jump=520;
+
+}
+
+}
+);
+
+
+/* =========================
+   BOTÃO DE PEGAR
+========================= */
+
+function updateAction(){
+
+const egg=
+nearestEgg();
+
+if(
+egg &&
+!state.carried
+){
+
+actionBtn.style.display=
+"block";
+
+actionBtn.textContent=
+"🥚 Pegar "+
+rarity[egg.type].name;
+
+}else{
+
+actionBtn.style.display=
+"none";
+
+}
+
+}
+
+
+actionBtn.onclick=()=>{
+
+const egg=
+nearestEgg();
+
+if(egg){
+
+tryPickup(egg);
+
+}
+
+};
+
+
+/* =========================
+   CÂMERA
+========================= */
+
+function render(){
+
+playerEl.style.left=
+state.x+"px";
+
+playerEl.style.top=
+(state.y-state.jumpY)+"px";
+
+
+if(state.carried){
+
+carriedEl.style.left=
+state.x+"px";
+
+carriedEl.style.top=
+(
+state.y-
+state.jumpY-
+55
+)+"px";
+
+}
+
+
+const vw=
+innerWidth;
+
+const vh=
+innerHeight;
+
+const camX=
+Math.max(
+0,
+Math.min(
+3600-vw,
+state.x-vw/2
+)
+);
+
+const camY=
+Math.max(
+0,
+Math.min(
+2200-vh,
+state.y-vh/2
+)
+);
+
+world.style.transform=
+`translate(${-camX}px,${-camY}px)`;
+
+}
+
+
+/* =========================
+   LOOP DO JOGO
+========================= */
+
+function loop(now){
+
+const dt=
+Math.min(
+0.035,
+(now-state.last)/1000
+);
+
+state.last=now;
+
+const speed=
+actualSpeed();
+
+state.vx=
+state.joystickX*speed;
+
+state.vy=
+state.joystickY*speed;
+
+state.x+=
+state.vx*dt;
+
+state.y+=
+state.vy*dt;
+
+
+/* LIMITES DO MAPA */
+
+state.x=
+Math.max(
+30,
+Math.min(
+3570,
+state.x
+)
+);
+
+state.y=
+Math.max(
+30,
+Math.min(
+2170,
+state.y
+)
+);
+
+
+/* PULO */
+
+if(jump>0){
+
+jump-=900*dt;
+
+state.jumpY=
+Math.max(
+0,
+Math.sin(
+Math.max(0,jump)/
+520*
+Math.PI
+)*95
+);
+
+if(jump<=0){
+
+state.jumpY=0;
+
+}
+
+}
+
+
+/* BASE */
+
+depositAtBase();
+
+/* OVO */
+
+updateCarry();
+
+/* BOTÃO */
+
+updateAction();
+
+/* CÂMERA */
+
+render();
+
+requestAnimationFrame(loop);
+
+}
+
+
+/* =========================
+   COMEÇAR JOGO
+========================= */
+
+function startGame(){
+
+updateUI();
+
+/* OVOS INICIAIS */
+
+spawnNatural("chicken");
+spawnNatural("chicken");
+
+spawnNatural("tiger");
+
+spawnNatural("gorilla");
+
+
+/* OVO NORMAL A CADA 15 SEGUNDOS */
+
+setInterval(()=>{
+
+const areas=[
+"chicken",
+"tiger",
+"gorilla"
+];
+
+const area=
+areas[
+Math.floor(
+Math.random()*areas.length
+)
+];
+
+spawnNatural(area);
+
+
+/* máximo de ovos */
+
+if(state.eggs.length>18){
+
+removeEgg(
+state.eggs[0]
+);
+
+}
+
+},15000);
+
+
+/*
+MÍTICO / SECRETO
+NORMAL:
+
+A cada 5 minutos.
+
+Secreto = 10%
+
+Mítico = 30%
+
+Isso é separado do painel DM.
+*/
+
+setInterval(
+spawnSpecialNaturally,
+300000
+);
+
+requestAnimationFrame(loop);
+
+}
+
+startGame();
+
+</script>
+
+</body>
+    </html>
