@@ -2559,35 +2559,102 @@ startGame();
 
 <!-- PAINEL DE EVENTOS -->
 <div class="event-panel">
-  <h3>🎉 Eventos</h3>
 
-  <button onclick="startEvent('halloween')">
-    🎃 Halloween ×2
-  </button>
+  <!-- LOGIN -->
+  <div id="eventLogin">
+    <h3>🔐 Painel de Eventos</h3>
 
-  <button onclick="startEvent('natal')">
-    🎄 Natal ×2,5
-  </button>
+    <input
+      type="password"
+      id="eventPassword"
+      placeholder="Digite a senha"
+    >
 
-  <button onclick="startEvent('meteorito')">
-    ☄️ Meteorito ×3,5
-  </button>
+    <button onclick="loginEventPanel()">
+      🔓 Entrar
+    </button>
 
-  <button onclick="startEvent('money2x')">
-    💰 2× Dinheiro
-  </button>
+    <p id="loginError"></p>
+  </div>
 
-  <button onclick="startEvent('speed2x')">
-    ⚡ 2× Velocidade
-  </button>
+  <!-- PAINEL -->
+  <div id="eventControls" style="display: none;">
 
-  <div id="eventStatus">
-    Nenhum evento ativo.
+    <h3>🎉 Eventos</h3>
+
+    <button onclick="startEvent('halloween')">
+      🎃 Halloween ×2
+    </button>
+
+    <button onclick="startEvent('natal')">
+      🎄 Natal ×2,5
+    </button>
+
+    <button onclick="startEvent('meteorito')">
+      ☄️ Meteorito ×3,5
+    </button>
+
+    <button onclick="startEvent('speed2x')">
+      ⚡ 2× Velocidade
+    </button>
+
+    <button onclick="startEvent('money2x')">
+      💰 2× Money
+    </button>
+
+    <button onclick="startEvent('pizza')">
+      🍕 Pizza ×5
+    </button>
+
+    <div id="eventStatus">
+      Nenhum evento ativo.
+    </div>
+
   </div>
 </div>
 
+
 <script>
+
+// =============================
+// 🔐 SENHA DO PAINEL
+// =============================
+
+const EVENT_PANEL_PASSWORD = "REXGAMESPRO3";
+
+function loginEventPanel() {
+
+  const password =
+    document.getElementById("eventPassword").value;
+
+  const error =
+    document.getElementById("loginError");
+
+  if (password === EVENT_PANEL_PASSWORD) {
+
+    document.getElementById("eventLogin").style.display =
+      "none";
+
+    document.getElementById("eventControls").style.display =
+      "block";
+
+    error.innerHTML = "";
+
+  } else {
+
+    error.innerHTML =
+      "❌ Senha incorreta!";
+
+  }
+}
+
+
+// =============================
+// 🎉 EVENTOS
+// =============================
+
 const EVENTS = {
+
   halloween: {
     name: "🎃 Halloween",
     multiplier: 2
@@ -2603,79 +2670,140 @@ const EVENTS = {
     multiplier: 3.5
   },
 
-  money2x: {
-    name: "💰 2× Dinheiro",
-    multiplier: 2
-  },
-
   speed2x: {
     name: "⚡ 2× Velocidade",
     multiplier: 2
+  },
+
+  money2x: {
+    name: "💰 2× Money",
+    multiplier: 2
+  },
+
+  pizza: {
+    name: "🍕 Pizza",
+    multiplier: 5
   }
+
 };
+
+
+// =============================
+// ⏱️ EVENTOS ATIVOS
+// =============================
 
 const activeEvents = {};
 
-// Todos os eventos duram 5 minutos
+
+// =============================
+// ▶️ ATIVAR EVENTO
+// =============================
+
 function startEvent(eventId) {
-  if (!EVENTS[eventId]) return;
 
-  activeEvents[eventId] = Date.now() + 5 * 60 * 1000;
+  const event = EVENTS[eventId];
 
-  updateEventStatus();
+  if (!event) return;
 
-  alert(
-    EVENTS[eventId].name +
-    " ativado por 5 minutos!"
-  );
+  // Evento dura 5 minutos
+  activeEvents[eventId] =
+    Date.now() + 5 * 60 * 1000;
+
+  updateEventDisplay();
+
+
+  setTimeout(() => {
+
+    if (
+      activeEvents[eventId] &&
+      Date.now() >= activeEvents[eventId]
+    ) {
+
+      delete activeEvents[eventId];
+
+      updateEventDisplay();
+
+    }
+
+  }, 5 * 60 * 1000);
+
 }
 
-// Verifica se o evento está ativo
+
+// =============================
+// 🔎 VERIFICAR EVENTO
+// =============================
+
 function isEventActive(eventId) {
+
   if (!activeEvents[eventId]) {
     return false;
   }
 
   if (Date.now() >= activeEvents[eventId]) {
+
     delete activeEvents[eventId];
+
     return false;
   }
 
   return true;
 }
 
-// Calcula o multiplicador dos pagamentos
-function getEventMultiplier() {
+
+// =============================
+// 🥚 MULTIPLICADOR DOS OVOS
+// =============================
+
+function getEggEventMultiplier() {
+
   let multiplier = 1;
+
 
   if (isEventActive("halloween")) {
     multiplier *= 2;
   }
 
+
   if (isEventActive("natal")) {
     multiplier *= 2.5;
   }
+
 
   if (isEventActive("meteorito")) {
     multiplier *= 3.5;
   }
 
-  if (isEventActive("money2x")) {
-    multiplier *= 2;
+
+  if (isEventActive("pizza")) {
+    multiplier *= 5;
   }
+
 
   return multiplier;
 }
 
-// Calcula o pagamento final do pet
-function getPetEventValue(baseValue) {
-  return Math.floor(
-    baseValue * getEventMultiplier()
-  );
+
+// =============================
+// 💰 MULTIPLICADOR DE MONEY
+// =============================
+
+function getMoneyEventMultiplier() {
+
+  if (isEventActive("money2x")) {
+    return 2;
+  }
+
+  return 1;
 }
 
-// Verifica o evento de velocidade
+
+// =============================
+// ⚡ MULTIPLICADOR DE VELOCIDADE
+// =============================
+
 function getSpeedEventMultiplier() {
+
   if (isEventActive("speed2x")) {
     return 2;
   }
@@ -2683,29 +2811,70 @@ function getSpeedEventMultiplier() {
   return 1;
 }
 
-// Atualiza o texto dos eventos
-function updateEventStatus() {
-  const status = document.getElementById("eventStatus");
+
+// =============================
+// 🥚 VALOR FINAL DO OVO
+// =============================
+
+function getEggEventValue(baseValue) {
+
+  return Math.floor(
+    baseValue * getEggEventMultiplier()
+  );
+
+}
+
+
+// =============================
+// 💰 VALOR FINAL DO MONEY
+// =============================
+
+function getMoneyEventValue(baseMoney) {
+
+  return Math.floor(
+    baseMoney * getMoneyEventMultiplier()
+  );
+
+}
+
+
+// =============================
+// 📊 ATUALIZAR PAINEL
+// =============================
+
+function updateEventDisplay() {
+
+  const status =
+    document.getElementById("eventStatus");
 
   if (!status) return;
 
+
   const active = [];
 
+
   for (const eventId in EVENTS) {
+
     if (isEventActive(eventId)) {
+
       const remaining =
         Math.max(
           0,
           activeEvents[eventId] - Date.now()
         );
 
+
       const minutes =
-        Math.floor(remaining / 60000);
+        Math.floor(
+          remaining / 60000
+        );
+
 
       const seconds =
         Math.floor(
           (remaining % 60000) / 1000
         );
+
 
       active.push(
         EVENTS[eventId].name +
@@ -2714,58 +2883,131 @@ function updateEventStatus() {
         ":" +
         String(seconds).padStart(2, "0")
       );
+
     }
+
   }
 
+
   if (active.length === 0) {
-    status.innerHTML = "Nenhum evento ativo.";
+
+    status.innerHTML =
+      "Nenhum evento ativo.";
+
   } else {
+
     status.innerHTML =
       "<b>Eventos ativos:</b><br>" +
       active.join("<br>");
+
   }
+
 }
+
 
 // Atualiza o contador a cada segundo
-setInterval(updateEventStatus, 1000);
+setInterval(
+  updateEventDisplay,
+  1000
+);
+
 </script>
 
+
 <style>
+
 .event-panel {
+
   background: #202020;
+
   color: white;
+
   padding: 15px;
+
   border-radius: 12px;
+
   margin: 10px;
+
   max-width: 320px;
+
 }
+
 
 .event-panel h3 {
+
   margin-top: 0;
+
 }
+
+
+.event-panel input {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  margin-bottom: 8px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+
+}
+
 
 .event-panel button {
+
   display: block;
+
   width: 100%;
+
   margin: 7px 0;
+
   padding: 12px;
+
   border: none;
+
   border-radius: 8px;
+
   font-size: 16px;
+
   cursor: pointer;
+
 }
+
 
 .event-panel button:active {
+
   transform: scale(0.97);
+
 }
 
+
+#loginError {
+
+  color: #ff5555;
+
+  font-weight: bold;
+
+}
+
+
 #eventStatus {
+
   margin-top: 12px;
+
   padding: 10px;
+
   background: #111;
+
   border-radius: 8px;
+
   line-height: 1.6;
-}  
+
+}
+
 </style>
-</body>
-</html>  
