@@ -4,3010 +4,641 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Egg World</title>
-
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
-  -webkit-user-select:none;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#111820;
-  font-family:Arial,sans-serif;
-}
-
-body{
-  touch-action:none;
-}
-
-button{
-  font-family:Arial,sans-serif;
-}
-
-#game{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  position:relative;
-  background:#78b96a;
-}
-
-#world{
-  position:absolute;
-  width:3600px;
-  height:2200px;
-  background:
-    radial-gradient(circle at 20% 30%,#ffffff10 0 3px,transparent 4px),
-    radial-gradient(circle at 60% 70%,#ffffff10 0 3px,transparent 4px),
-    radial-gradient(circle at 80% 20%,#ffffff10 0 3px,transparent 4px),
-    #78b96a;
-}
-
-/* MAPA */
-
-.water{
-  position:absolute;
-  background:#55aee8;
-  border:10px solid #367ea8;
-  border-radius:45px;
-  box-shadow:inset 0 0 0 5px #ffffff33;
-}
-
-.road{
-  position:absolute;
-  background:#c8a872;
-  border:8px solid #927449;
-  border-radius:25px;
-}
-
-.tree{
-  position:absolute;
-  width:60px;
-  height:75px;
-}
-
-.tree:before{
-  content:"";
-  position:absolute;
-  left:24px;
-  top:38px;
-  width:13px;
-  height:35px;
-  background:#704726;
-  border-radius:5px;
-}
-
-.tree:after{
-  content:"";
-  position:absolute;
-  left:3px;
-  top:0;
-  width:54px;
-  height:54px;
-  background:#2f7d3c;
-  border:5px solid #24642f;
-  border-radius:50%;
-}
-
-.rock{
-  position:absolute;
-  width:48px;
-  height:32px;
-  background:#777;
-  border:4px solid #555;
-  border-radius:50%;
-}
-
-/* BASE */
-
-#base{
-  position:absolute;
-  left:120px;
-  top:820px;
-  width:430px;
-  height:410px;
-  background:#d8c49a;
-  border:10px solid #69482b;
-  border-radius:35px;
-  box-shadow:0 14px 0 #0003;
-}
-
-#base:after{
-  content:"";
-  position:absolute;
-  inset:-22px;
-  border:8px dashed #8b673d;
-  border-radius:50px;
-  pointer-events:none;
-}
-
-.baseTitle{
-  text-align:center;
-  color:#49351f;
-  padding-top:18px;
-  font-size:30px;
-  font-weight:900;
-}
-
-.baseSub{
-  text-align:center;
-  color:#654c31;
-  font-weight:bold;
-  font-size:13px;
-  margin-top:5px;
-}
-
-#slots{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:22px;
-}
-
-.slot{
-  height:120px;
-  border:4px solid #846445;
-  background:#ffffff66;
-  border-radius:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  font-size:39px;
-}
-
-.slot small{
-  position:absolute;
-  bottom:6px;
-  font-size:10px;
-  color:#49351f;
-}
-
-.openBtn{
-  position:absolute;
-  bottom:7px;
-  background:#167ed0;
-  color:white;
-  border:0;
-  border-radius:7px;
-  padding:5px 8px;
-  font-size:10px;
-}
-
-/* ÁREAS */
-
-.area{
-  position:absolute;
-  width:470px;
-  height:360px;
-  border:10px solid #47362a;
-  border-radius:42px;
-  box-shadow:0 12px 0 #0003;
-}
-
-.area h2{
-  position:absolute;
-  left:50%;
-  top:16px;
-  transform:translateX(-50%);
-  white-space:nowrap;
-  background:#18202de8;
-  color:white;
-  padding:12px 20px;
-  border-radius:15px;
-  text-align:center;
-  font-size:23px;
-  z-index:5;
-}
-
-.area h2 small{
-  display:block;
-  font-size:11px;
-  margin-top:5px;
-}
-
-#chickenArea{
-  left:930px;
-  top:360px;
-  background:#dfc99a;
-}
-
-#tigerArea{
-  left:1650px;
-  top:980px;
-  background:#d78843;
-}
-
-#gorillaArea{
-  left:2760px;
-  top:330px;
-  background:#69656d;
-}
-
-.animal{
-  position:absolute;
-  left:50%;
-  top:57%;
-  transform:translate(-50%,-50%);
-  font-size:92px;
-  filter:drop-shadow(0 7px 3px #0005);
-}
-
-/* OVOS */
-
-.egg{
-  position:absolute;
-  width:72px;
-  height:86px;
-  border-radius:50% 50% 45% 45%;
-  border:5px solid #493c34;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:34px;
-  z-index:6;
-  box-shadow:0 7px 0 #0004;
-  cursor:pointer;
-}
-
-.common{background:#f5f5f5}
-.uncommon{background:#55c96a}
-.rare{background:#55a7f2}
-.mythic{background:#ef5555}
-.legendary{background:#ffd83d}
-.secret{background:#ad59e8}
-
-/* PLAYER */
-
-#player{
-  position:absolute;
-  width:54px;
-  height:72px;
-  z-index:20;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
-}
-
-.head{
-  position:absolute;
-  left:12px;
-  top:0;
-  width:30px;
-  height:30px;
-  background:#f1c27d;
-  border:3px solid #6d4a2b;
-  border-radius:7px;
-}
-
-.body{
-  position:absolute;
-  left:9px;
-  top:29px;
-  width:36px;
-  height:29px;
-  background:#2e73d1;
-  border:3px solid #19467f;
-  border-radius:7px;
-}
-
-.leg{
-  position:absolute;
-  top:56px;
-  width:13px;
-  height:16px;
-  background:#333;
-  border-radius:4px;
-}
-
-.l{left:11px}
-.r{right:11px}
-
-#carried{
-  position:absolute;
-  z-index:21;
-  display:none;
-  font-size:38px;
-  transform:translate(-50%,-100%);
-  filter:drop-shadow(0 5px 2px #0005);
-}
-
-/* INTERFACE */
-
-#ui{
-  position:fixed;
-  left:0;
-  right:0;
-  top:0;
-  z-index:50;
-  pointer-events:none;
-}
-
-#topbar{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  padding:10px;
-}
-
-.badge{
-  background:#162333e8;
-  color:white;
-  border:2px solid #ffffff22;
-  border-radius:12px;
-  padding:8px 11px;
-  font-weight:bold;
-  font-size:13px;
-  box-shadow:0 5px 12px #0003;
-}
-
-#topBtns{
-  margin-left:auto;
-  display:flex;
-  gap:7px;
-  pointer-events:auto;
-}
-
-.uiBtn{
-  border:0;
-  border-radius:12px;
-  padding:9px 11px;
-  background:#ffffffea;
-  color:#17202a;
-  font-weight:900;
-}
-
-/* ANALÓGICO */
-
-#joystick{
-  position:fixed;
-  left:24px;
-  bottom:25px;
-  width:145px;
-  height:145px;
-  border-radius:50%;
-  background:#0005;
-  border:4px solid #ffffff55;
-  z-index:60;
-  pointer-events:auto;
-}
-
-#stick{
-  position:absolute;
-  left:38px;
-  top:38px;
-  width:69px;
-  height:69px;
-  border-radius:50%;
-  background:#ffffffb8;
-  border:5px solid #ffffff88;
-}
-
-/* BOTÃO PULO */
-
-#jump{
-  position:fixed;
-  right:25px;
-  bottom:35px;
-  width:90px;
-  height:90px;
-  border:0;
-  border-radius:50%;
-  background:#2f8fe8;
-  color:white;
-  font-size:28px;
-  font-weight:900;
-  z-index:60;
-  box-shadow:0 7px 0 #1b5e9a;
-}
-
-/* BOTÃO OVO */
-
-#action{
-  position:fixed;
-  right:125px;
-  bottom:50px;
-  background:#f5a623;
-  color:white;
-  border:0;
-  border-radius:16px;
-  padding:14px 17px;
-  font-weight:900;
-  z-index:60;
-  display:none;
-  box-shadow:0 5px 0 #a66d10;
-}
-
-/* TIMER */
-
-#timer{
-  position:fixed;
-  left:50%;
-  top:120px;
-  transform:translateX(-50%);
-  z-index:55;
-  background:#c83c3c;
-  color:white;
-  padding:9px 15px;
-  border-radius:12px;
-  font-weight:900;
-  display:none;
-}
-
-/* MODAL */
-
-#modalShade{
-  position:fixed;
-  inset:0;
-  background:#0009;
-  z-index:100;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
-
-.modal{
-  width:min(520px,95vw);
-  max-height:88vh;
-  overflow:auto;
-  background:#f5f0e8;
-  border:5px solid #553c25;
-  border-radius:22px;
-  padding:20px;
-  box-shadow:0 15px 40px #0008;
-}
-
-.modal h2{
-  margin-bottom:12px;
-  color:#35271c;
-}
-
-.modal p{
-  margin:7px 0;
-  color:#4c3c2d;
-}
-
-.close{
-  float:right;
-  border:0;
-  background:#d9534f;
-  color:white;
-  border-radius:8px;
-  padding:5px 9px;
-  font-weight:bold;
-}
-
-.shopGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-  margin-top:12px;
-}
-
-.shopItem{
-  background:white;
-  border:2px solid #d4c7b7;
-  border-radius:12px;
-  padding:11px;
-}
-
-.shopItem button,
-.adminAction{
-  width:100%;
-  margin-top:7px;
-  border:0;
-  border-radius:8px;
-  padding:9px;
-  background:#2479d1;
-  color:white;
-  font-weight:bold;
-}
-
-.adminAction.red{
-  background:#c74343;
-}
-
-.select{
-  width:100%;
-  padding:10px;
-  border-radius:9px;
-  border:2px solid #bbb;
-  margin:7px 0;
-}
-
-.progress{
-  height:8px;
-  background:#ddd;
-  border-radius:9px;
-  overflow:hidden;
-  margin-top:8px;
-}
-
-.progress i{
-  display:block;
-  height:100%;
-  width:0;
-  background:#2f8fe8;
-}
-
-#toast{
-  position:fixed;
-  left:50%;
-  top:82px;
-  transform:translateX(-50%);
-  z-index:150;
-  background:#162333f0;
-  color:white;
-  padding:11px 15px;
-  border-radius:12px;
-  display:none;
-  font-weight:bold;
-  box-shadow:0 7px 20px #0005;
-}
-
-/* MOBILE */
-
-@media(max-width:600px){
-
-  .badge{
-    font-size:11px;
-    padding:7px 8px;
-  }
-
-  .uiBtn{
-    font-size:10px;
-    padding:8px;
-  }
-
-  #joystick{
-    width:130px;
-    height:130px;
-  }
-
-  #jump{
-    width:78px;
-    height:78px;
-    right:20px;
-  }
-
-  #action{
-    right:105px;
-    bottom:43px;
-  }
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#111;color:#fff}
+#game{position:relative;width:100vw;height:100vh;overflow:hidden;background:#6fbe55}
+#world{position:absolute;left:0;top:0;width:16000px;height:3000px;background:
+radial-gradient(circle at 20% 20%,#8bd66c 0 2%,transparent 2.2%),
+radial-gradient(circle at 70% 70%,#67ae4f 0 2%,transparent 2.2%),
+#76c55b}
+.road{position:absolute;background:#8d8d8d;border:5px solid #6e6e6e;border-radius:20px}
+.road.h{height:90px}.road.v{width:90px}
+.water{position:absolute;background:#38a9d8;border:8px solid #227fa9;border-radius:40px}
+.tree{position:absolute;width:70px;height:70px;border-radius:50%;background:#23833b;box-shadow:0 18px 0 #17642c}
+.rock{position:absolute;width:65px;height:42px;border-radius:45%;background:#777}
+#base{position:absolute;left:120px;top:1120px;width:470px;height:430px;background:#9b6b3f;border:10px solid #684528;border-radius:25px;box-shadow:0 15px 0 #51351f}
+.zone{position:absolute;border-radius:30px;border:10px solid #555;overflow:hidden}
+#chickenZone{left:1050px;top:400px;width:600px;height:430px;background:#e7d8a2;border-color:#a98d4b}
+#tigerZone{left:2100px;top:1400px;width:650px;height:470px;background:#c88439;border-color:#7d4a22}
+#gorillaZone{left:3300px;top:400px;width:700px;height:500px;background:#5d5b63;border-color:#393840}
+#dragonZone{left:6200px;top:1120px;width:900px;height:650px;background:radial-gradient(circle,#7d1717,#2a0808 55%,#120303);border-color:#ff4b00;box-shadow:0 0 50px #ff3b00}
+.zone#sharkZone{left:7600px;top:1120px;width:900px;height:650px;background:linear-gradient(#159dcc,#07537d);border-color:#063b5a}.zone#dinoZone{left:9000px;top:1120px;width:900px;height:650px;background:linear-gradient(#9b6334,#4b2818);border-color:#6b3b1d}.zone#alienZone{left:10500px;top:1120px;width:1000px;height:650px;background:radial-gradient(circle,#351b68,#09041c 70%);border-color:#7b4dff;box-shadow:0 0 50px #6b3cff}.zoneTitle{font-size:34px;font-weight:900;text-align:center;margin:25px;text-shadow:0 3px 5px #000}
+.zoneInfo{text-align:center;font-weight:bold;font-size:18px}
+.lava{position:absolute;background:#ff4a00;box-shadow:0 0 25px #ff2400;border-radius:50%}
+.pet{position:absolute;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;border:4px solid #fff;z-index:8}
+.egg{position:absolute;width:48px;height:58px;border-radius:50% 50% 45% 45%;display:flex;align-items:center;justify-content:center;font-size:25px;border:3px solid #fff;z-index:7;cursor:pointer;box-shadow:0 4px 10px #0008}
+.common{background:#fff;color:#222}.uncommon{background:#2fc05a}.rare{background:#318cff}.mythic{background:#e93434}.legendary{background:#ffd21a;color:#7a4d00}.secret{background:#a348ff}.eternal{background:linear-gradient(135deg,#fff,#ffd000,#ff43d0,#4bf);animation:shine 1s infinite alternate}.divine{background:linear-gradient(135deg,#fff,#8ff,#8a5cff,#fff);animation:shine 0.8s infinite alternate}.celestial{background:linear-gradient(135deg,#0ff,#7af,#fff,#d58cff);animation:shine 0.55s infinite alternate}
+@keyframes shine{to{filter:brightness(1.5)}}
+#player{position:absolute;width:48px;height:60px;background:#4b8cff;border:4px solid #fff;border-radius:18px;z-index:20;display:flex;align-items:center;justify-content:center;font-size:25px}
+.remotePlayer{position:absolute;width:44px;height:54px;background:#7d5cff;border:3px solid #fff;border-radius:16px;z-index:19;display:flex;align-items:center;justify-content:center;font-size:23px;opacity:.75;pointer-events:none}.remotePlayer:after{content:"ONLINE";position:absolute;top:-18px;font-size:9px;background:#111c;padding:2px 4px;border-radius:5px}
+#carriedEgg{position:absolute;z-index:30;font-size:34px;display:none;pointer-events:none}
+#hud{position:fixed;left:10px;top:10px;z-index:100;background:#111c;padding:10px;border-radius:14px;min-width:170px}
+#hud b{color:#ffe34b}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:300;background:#111e;padding:10px 16px;border-radius:20px;display:none}
+#globalMessages{position:fixed;left:50%;top:72px;transform:translateX(-50%);z-index:240;width:min(92vw,720px);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.globalMsg{background:linear-gradient(135deg,#1b1030,#3b1261);border:2px solid #e75cff;box-shadow:0 5px 20px #0009;padding:10px 16px;border-radius:18px;font-weight:900;text-align:center;animation:globalIn .25s ease-out}
+@keyframes globalIn{from{opacity:0;transform:translateY(-15px) scale(.95)}to{opacity:1;transform:none}}
+#joystick{position:fixed;left:20px;bottom:25px;width:145px;height:145px;border-radius:50%;background:#ffffff33;border:3px solid #fff8;z-index:200;touch-action:none}
+#stick{position:absolute;left:47px;top:47px;width:51px;height:51px;border-radius:50%;background:#fff9}
+#jumpBtn{position:fixed;right:25px;bottom:35px;width:90px;height:90px;border-radius:50%;border:4px solid #fff;background:#ff9f1a;color:#fff;font-size:18px;font-weight:bold;z-index:200}
+#slowBtn{position:fixed;right:25px;bottom:140px;padding:11px 14px;border:0;border-radius:12px;background:#333;color:#fff;font-weight:bold;z-index:200}
+#shopBtn,#adminBtn{position:fixed;top:10px;z-index:210;padding:10px 14px;border:0;border-radius:12px;font-weight:bold}
+#shopBtn{right:10px;background:#ffd33d}.admin{right:100px;background:#e75cff}
+#panel{display:none;position:fixed;inset:0;background:#000b;z-index:250;padding:20px;overflow:auto}
+.panelBox{max-width:620px;margin:20px auto;background:#202020;padding:18px;border-radius:18px}
+.panelBox button,.panelBox select,.panelBox input{width:100%;margin:6px 0;padding:11px;border-radius:10px;border:0}
+.panelBox button{background:#444;color:#fff;font-weight:bold}
+.close{background:#b22!important}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slot{display:inline-flex;width:100px;height:100px;margin:7px;background:#ffffff18;border:3px dashed #aaa;border-radius:14px;align-items:center;justify-content:center;flex-direction:column}
+#dropEggBtn{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);z-index:190;background:#d94b4b;color:#fff;border:0;border-radius:12px;padding:10px 16px;font-weight:bold;display:none}
+#carryTimer{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:180;background:#111d;padding:8px 15px;border-radius:14px;display:none}
+#openModal{display:none;position:fixed;inset:0;background:#000c;z-index:280;align-items:center;justify-content:center}
+.openBox{background:#222;padding:25px;border-radius:20px;text-align:center;width:min(90vw,400px);position:relative}
+#closeOpenBtn{margin-top:16px;width:100%;padding:12px;border:0;border-radius:12px;background:#555;color:#fff;font-size:16px;font-weight:bold}
+#progress{height:18px;background:#555;border-radius:10px;overflow:hidden}.bar{height:100%;width:0;background:#55d66b}
+.eventTag{padding:5px 8px;margin:3px;background:#333;border-radius:8px;display:inline-block}
+@media(max-width:600px){#hud{font-size:12px}.zoneTitle{font-size:25px}.panelBox{margin:0 auto}.row{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
-
 <div id="game">
-
 <div id="world">
-
-<!-- ÁGUA -->
-<div class="water" style="left:620px;top:120px;width:260px;height:360px"></div>
-<div class="water" style="left:1980px;top:240px;width:430px;height:190px"></div>
-<div class="water" style="left:1200px;top:1450px;width:500px;height:270px"></div>
-
-<!-- ESTRADAS -->
-<div class="road" style="left:0;top:1000px;width:3600px;height:150px"></div>
-<div class="road" style="left:600px;top:0;width:130px;height:2200px"></div>
-<div class="road" style="left:1100px;top:650px;width:1200px;height:100px"></div>
-<div class="road" style="left:2380px;top:650px;width:1000px;height:100px"></div>
-
-<!-- BASE -->
+<div class="road h" style="left:350px;top:1330px;width:11350px"></div>
+<div class="water" style="left:700px;top:1850px;width:500px;height:320px"></div>
+<div class="water" style="left:7900px;top:1850px;width:600px;height:320px"></div>
+<div class="water" style="left:10000px;top:300px;width:600px;height:320px"></div>
 <div id="base">
-
-<div class="baseTitle">
-🏠 SUA BASE
-</div>
-
-<div class="baseSub">
-Leve os ovos para cá e abra!
-</div>
-
+<div class="zoneTitle">🏠 SUA BASE</div>
+<div class="zoneInfo">Leve os ovos para cá para abrir!</div>
 <div id="slots"></div>
-
 </div>
-
-<!-- ÁREA GALINHA -->
-<div class="area" id="chickenArea">
-
-<h2>
-🐔 GALINHA
-<small>Velocidade mínima: 1</small>
-</h2>
-
-<div class="animal">🐔</div>
-
+<div id="chickenZone" class="zone"><div class="zoneTitle">🐔 GALINHA</div><div class="zoneInfo">Velocidade mínima: 1</div></div>
+<div id="tigerZone" class="zone"><div class="zoneTitle">🐯 TIGRE</div><div class="zoneInfo">Velocidade mínima: 10</div></div>
+<div id="gorillaZone" class="zone"><div class="zoneTitle">🦍 GORILA</div><div class="zoneInfo">Velocidade mínima: 30</div></div>
+<div id="dragonZone" class="zone">
+<div class="zoneTitle">🐉 DRAGÃO</div><div class="zoneInfo">🌋 Velocidade mínima: 40 • ♾️ Eterno: 2%</div>
+<div class="lava" style="left:80px;top:150px;width:300px;height:50px"></div>
+<div class="lava" style="left:480px;top:300px;width:330px;height:55px"></div>
+<div class="lava" style="left:180px;top:480px;width:420px;height:45px"></div>
 </div>
-
-<!-- ÁREA TIGRE -->
-<div class="area" id="tigerArea">
-
-<h2>
-🐯 TIGRE
-<small>Velocidade mínima: 10</small>
-</h2>
-
-<div class="animal">🐯</div>
-
-</div>
-
-<!-- ÁREA GORILA -->
-<div class="area" id="gorillaArea">
-
-<h2>
-🦍 GORILA
-<small>Velocidade mínima: 30</small>
-</h2>
-
-<div class="animal">🦍</div>
-
-</div>
-
-<!-- ÁRVORES -->
-<div class="tree" style="left:760px;top:570px"></div>
-<div class="tree" style="left:820px;top:1280px"></div>
-<div class="tree" style="left:1420px;top:250px"></div>
-<div class="tree" style="left:1500px;top:1380px"></div>
-<div class="tree" style="left:2500px;top:250px"></div>
-<div class="tree" style="left:2600px;top:1500px"></div>
-<div class="tree" style="left:3200px;top:500px"></div>
-<div class="tree" style="left:3300px;top:1250px"></div>
-
-<!-- PEDRAS -->
-<div class="rock" style="left:700px;top:1500px"></div>
-<div class="rock" style="left:1300px;top:500px"></div>
-<div class="rock" style="left:2200px;top:1250px"></div>
-<div class="rock" style="left:3000px;top:1200px"></div>
-
-<!-- OVOS -->
-<div id="eggLayer"></div>
-
-<!-- JOGADOR -->
-<div id="player">
-
-<div class="head"></div>
-<div class="body"></div>
-<div class="leg l"></div>
-<div class="leg r"></div>
-
-</div>
-
-<!-- OVO CARREGADO -->
-<div id="carried">🥚</div>
-
+<div id="sharkZone" class="zone"><div class="zoneTitle">🦈 TUBARÃO</div><div class="zoneInfo">🌊 Velocidade mínima: 50 • Mesmo sistema do Dragão</div><div class="water" style="left:80px;top:170px;width:740px;height:300px"></div></div>
+<div id="dinoZone" class="zone"><div class="zoneTitle">🦖 DINOSSAURO</div><div class="zoneInfo">Velocidade mínima: 65 • ✨ Divino</div></div>
+<div id="alienZone" class="zone"><div class="zoneTitle">👽 ALIENÍGENA</div><div class="zoneInfo">Velocidade mínima: 85 • 🌌 Celestial</div></div>
+<div id="player">🧑</div><div id="carriedEgg">🥚</div>
 </div>
 </div>
 
-<!-- INTERFACE -->
+<div id="hud">💰 $<b id="money">500</b><br>⚡ Velocidade: <b id="speed">1</b><br>🥚 Ovos: <b id="eggCount">0</b><div id="events"></div></div>
+<button id="shopBtn">🛒 Lojas</button>
+<button id="adminBtn" class="admin">🔐 DM</button>
+<div id="globalMessages"></div>
+<button id="slowBtn">🐢 Lento: OFF</button>
+<div id="joystick"><div id="stick"></div></div><button id="jumpBtn">PULAR</button>
+<button id="dropEggBtn">🥚 Soltar ovo</button><div id="carryTimer"></div><div id="toast"></div>
 
-<div id="ui">
+<div id="panel"><div class="panelBox"><h2 id="panelTitle">Painel</h2><div id="panelContent"></div><button class="close" onclick="closePanel()">Fechar</button></div></div>
+<div id="openModal"><div class="openBox"><h2 id="openTitle"></h2><p id="openText"></p><div id="progress"><div class="bar" id="progressBar"></div></div><button id="closeOpenBtn" onclick="closeOpenModal()">✖ Fechar</button></div></div>
 
-<div id="topbar">
-
-<div class="badge">
-💰 <span id="money">0</span>
-</div>
-
-<div class="badge">
-⚡ Nv. <span id="speedLevel">1</span>
-</div>
-
-<div class="badge">
-👟 <span id="trailName">Nenhuma</span>
-</div>
-
-<div id="topBtns">
-
-<button class="uiBtn" id="speedShopBtn">
-⚡ Loja
-</button>
-
-<button class="uiBtn" id="trailShopBtn">
-👟 Trilhas
-</button>
-
-<button class="uiBtn" id="adminBtn">
-🔐 DM
-</button>
-
-</div>
-
-</div>
-</div>
-
-<!-- TIMER -->
-<div id="timer"></div>
-
-<!-- PEGAR OVO -->
-<button id="action">
-🥚 Pegar ovo
-</button>
-
-<!-- ANALÓGICO -->
-<div id="joystick">
-<div id="stick"></div>
-</div>
-
-<!-- PULO -->
-<button id="jump">
-⬆️
-</button>
-
-<!-- AVISO -->
-<div id="toast"></div>
-
-<!-- MODAL -->
-<div id="modalShade">
-<div class="modal" id="modal"></div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ===== MULTIPLAYER / GLOBAL =====
+// Cole aqui os dados públicos do seu projeto Supabase. Nunca coloque service_role aqui.
+const SUPABASE_URL="https://nrdnidbcyokvpzefltws.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yZG5pZGJjeW9rdnB6ZWZsd3MiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc5MDcyMjc5MywiZXhwIjoyMTA2Mjk4NzkzfQ.J5Btr1eLXHCtRkRcooPzEpQDlnbmSSL-UdfiKM9bff8";
+const MULTIPLAYER_ENABLED=SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("COLE_AQUI") && !SUPABASE_KEY.includes("COLE_AQUI");
+let sb=null, mpChannel=null, myPlayerId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random());
+const remotePlayers=new Map();
+function mpReady(){return MULTIPLAYER_ENABLED && !!window.supabase;}
+function mpInit(){
+ if(!mpReady()) return;
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ mpChannel=sb.channel("rex-game-global",{config:{broadcast:{acknowledge:true},presence:{key:myPlayerId}}});
+ mpChannel.on("broadcast",{event:"game"},({payload})=>mpReceive(payload))
+   .on("presence",{event:"sync"},()=>{})
+   .subscribe(status=>{
+     if(status==="SUBSCRIBED"){
+       toast("🌎 Multiplayer global conectado!");
+       mpChannel.track({id:myPlayerId,name:"Jogador",x:state.x,y:state.y});
+     }
+   });
 
-"use strict";
+ const dbChannel=sb.channel("global-messages-db");
+ dbChannel.on("postgres_changes",
+   {event:"INSERT",schema:"public",table:"global_messages"},
+   payload=>{
+     const msg=payload?.new?.message;
+     if(!msg) return;
+     const ownAt=recentOwnGlobalMessages.get(msg);
+     if(ownAt && Date.now()-ownAt<5000){
+       recentOwnGlobalMessages.delete(msg);
+       return;
+     }
+     showGlobalMessage(msg);
+   }).subscribe();
 
-/* =========================
-   CONFIGURAÇÕES
-========================= */
+ sb.from("global_messages")
+   .select("message,created_at")
+   .order("created_at",{ascending:false})
+   .limit(5)
+   .then(({data,error})=>{
+     if(!error && Array.isArray(data)) data.reverse().forEach(row=>showGlobalMessage(row.message));
+   });
+}
+async function mpSend(payload){if(!mpChannel)return;try{await mpChannel.send({type:"broadcast",event:"game",payload});}catch(e){console.warn("MP",e)}}
+function mpReceive(p){
+ if(!p||p.sender===myPlayerId)return;
+ if(p.type==="player"){let el=remotePlayers.get(p.sender);if(!el){el=document.createElement("div");el.className="remotePlayer";el.textContent="🧑";world.appendChild(el);remotePlayers.set(p.sender,el)}el.style.left=p.x+"function createEgg(area,rarity,admin=false,syncedEgg=null){
+ const a=areaData[area]; if(!a)return;
+ const e=syncedEgg||{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+Math.random()),area,rarity,x:a.x+80+Math.random()*(a.w-160),y:a.y+90+Math.random()*(a.h-150)};
+ if(state.worldEggs.some(x=>String(x.id)===String(e.id)))return;
+ state.worldEggs.push(e);renderEgg(e);updateHud();
+ if(admin)mpSend({type:"spawn",sender:myPlayerId,egg:{id:e.id,area:e.area,rarity:e.rarity,x:e.x,y:e.y}});
+}
 
-const ADMIN_PASSWORD="REX-7391";
+function renderEgg(e){
+ const el=document.createElement("div");
+ el.className="egg "+rarityData[e.rarity].color;
+ el.dataset.id=e.id;
+ el.textContent="🥚";
+ el.style.left=e.x+"px";
+ el.style.top=e.y+"px";
+ el.onclick=()=>tryPickEgg(e);
+ world.appendChild(el);
+ e.el=el;
+}
 
-const world=document.getElementById("world");
-const playerEl=document.getElementById("player");
-const carriedEl=document.getElementById("carried");
-const eggLayer=document.getElementById("eggLayer");
-const actionBtn=document.getElementById("action");
-const timerEl=document.getElementById("timer");
-const modalShade=document.getElementById("modalShade");
-const modal=document.getElementById("modal");
-const toast=document.getElementById("toast");
+function removeEgg(e){
+ e.el?.remove();
+ state.worldEggs=state.worldEggs.filter(x=>x!==e);
+ updateHud();
+}
 
-const state={
+function tryPickEgg(e){
+ if(state.carried)return toast("Você já está carregando um ovo!");
+ if(state.speedLevel<areaData[e.area].min)return toast("Você precisa de velocidade "+areaData[e.area].min+"!");
+ if(distance(state,e)>90)return toast("Chegue mais perto do ovo!");
+ state.carried=e;
+ removeEgg(e);
+ mpSend({type:"removeEgg",sender:myPlayerId,id:e.id});
+ carriedEl.style.display="block";
+ document.getElementById("dropEggBtn").style.display="block";
+ startCarryTimer(e);
+ toast("Ovo pego! Volte para sua base!");
+}
 
-x:300,
-y:1020,
+function startCarryTimer(e){
+ const seconds=Math.max(12,Math.round(40+state.speedLevel*2));
+ const end=Date.now()+seconds*1000;
+ const box=document.getElementById("carryTimer");
+ box.style.display="block";
+ clearInterval(window.carryInterval);
+ window.carryInterval=setInterval(()=>{
+   const left=Math.max(0,end-Date.now());
+   box.textContent="🥚 Tempo do ovo: "+Math.ceil(left/1000)+"s";
+   if(left<=0){
+     clearInterval(window.carryInterval);
+     state.carried=null;
+     carriedEl.style.display="none";
+     document.getElementById("dropEggBtn").style.display="none";
+     box.style.display="none";
+     toast("O ovo foi perdido!");
+   }
+ },200);
+}
 
-vx:0,
-vy:0,
+function inBase(){
+ return state.x>120&&state.x<590&&state.y>1120&&state.y<1550;
+}
 
-jumpY:0,
+function depositEgg(){
+ if(!state.carried||!inBase())return;
+ if(state.baseEggs.length>=4)return toast("Sua base já tem 4 ovos!");
+ const e=state.carried;
+ e.deposited=true;
+ state.baseEggs.push(e);
+ state.carried=null;
+ carriedEl.style.display="none";
+ document.getElementById("dropEggBtn").style.display="none";
+ document.getElementById("carryTimer").style.display="none";
+ clearInterval(window.carryInterval);
+ renderBase();
+ updateHud();
+ toast("Ovo chegou à base! Abra o ovo.");
+}
 
-money:500,
+function dropEgg(){
+ if(!state.carried)return;
+ const e=state.carried;
+ e.deposited=false;
+ e.x=Math.max(30,Math.min(15900,state.x+55));
+ e.y=Math.max(30,Math.min(2920,state.y+20));
+ state.carried=null;
+ carriedEl.style.display="none";
+ document.getElementById("dropEggBtn").style.display="none";
+ document.getElementById("carryTimer").style.display="none";
+ clearInterval(window.carryInterval);
+ state.worldEggs.push(e);
+ renderEgg(e);
+ updateHud();
+ toast("🥚 Ovo solto!");
+}
 
-speedLevel:1,
+function renderBase(){
+ const s=document.getElementById("slots");
+ s.innerHTML="";
+ for(let i=0;i<4;i++){
+   const egg=state.baseEggs[i];
+   const d=document.createElement("div");
+   d.className="slot";
+   if(egg){
+     d.innerHTML="🥚<small>"+rarityData[egg.rarity].name+"</small>";
+     d.onclick=()=>openEgg(egg);
+   }else{
+     d.textContent="Vazio";
+   }
+   s.appendChild(d);
+ }
+}
 
-trail:null,
+let openInterval=null;
+let openingEgg=null;
 
-carried:null,
+function closeOpenModal(){
+ if(openInterval){
+   clearInterval(openInterval);
+   openInterval=null;
+ }
+ openingEgg=null;
+ document.getElementById("openModal").style.display="none";
+ document.getElementById("progressBar").style.width="0%";
+}
 
-baseEggs:[],
+function openEgg(e){
+ if(!e.deposited)return;
+ if(openInterval)closeOpenModal();
+ openingEgg=e;
+ const t=rarityData[e.rarity].time*1000;
+ document.getElementById("openModal").style.display="flex";
+ document.getElementById("openTitle").textContent="Abrindo "+rarityData[e.rarity].name;
+ document.getElementById("openText").textContent="Você pode fechar e abrir novamente depois.";
+ let start=Date.now();
 
-eggs:[],
+ openInterval=setInterval(()=>{
+   let p=Math.min(1,(Date.now()-start)/t);
+   document.getElementById("progressBar").style.width=(p*100)+"%";
 
-nextId:1,
+   if(p>=1){
+     clearInterval(openInterval);
+     openInterval=null;
+     document.getElementById("openModal").style.display="none";
+     openingEgg=null;
 
-last:performance.now(),
+     state.baseEggs=state.baseEggs.filter(x=>x!==e);
+     state.pets.push(e.rarity);
 
-joystickX:0,
-joystickY:0
+     const value=Math.floor(rarityData[e.rarity].value*getPayMultiplier());
+     state.money+=value;
 
+     renderBase();
+     updateHud();
+
+     toast("🎉 "+rarityData[e.rarity].name+"! +$"+value.toLocaleString("pt-BR"));
+   }
+ },200);
+}
+
+function getPayMultiplier(){
+ let m=1;
+ if(activeEvents.halloween)m*=2;
+ if(activeEvents.natal)m*=2.5;
+ if(activeEvents.meteorito)m*=3.5;
+ if(activeEvents.money2x)m*=2;
+ if(activeEvents.alien5x)m*=5;
+ if(activeEvents.trex5x)m*=5;
+ return m;
+}
+
+const activeEvents={};
+
+const eventNames={
+ halloween:"🎃 Halloween",
+ natal:"🎄 Natal",
+ meteorito:"☄️ Meteorito",
+ money2x:"💰 2× Dinheiro",
+ speed2x:"⚡ 2× Velocidade",
+ alien5x:"👽 Evento Alienígena — 5× Dinheiro",
+ trex5x:"🦖 Evento T-Rex — 5× Dinheiro"
 };
 
-
-/* =========================
-   RARIDADES
-========================= */
-
-const rarity={
-
-common:{
-name:"Comum",
-cls:"common",
-emoji:"⚪",
-open:1,
-reward:25
-},
-
-uncommon:{
-name:"Incomum",
-cls:"uncommon",
-emoji:"🟢",
-open:2,
-reward:60
-},
-
-rare:{
-name:"Raro",
-cls:"rare",
-emoji:"🔵",
-open:5,
-reward:140
-},
-
-mythic:{
-name:"Mítico",
-cls:"mythic",
-emoji:"🔴",
-open:10,
-reward:400
-},
-
-legendary:{
-name:"Lendário",
-cls:"legendary",
-emoji:"🟡",
-open:30,
-reward:900
-},
-
-secret:{
-name:"Secreto",
-cls:"secret",
-emoji:"🟣",
-open:120,
-reward:5000
+function startEvent(id){
+ const expires=Date.now()+300000;
+ activeEvents[id]=expires;
+ renderEvents();
+ toast(eventNames[id]+" ativado por 5 minutos!");
+ globalMessage("colocou "+eventNames[id]+" no servidor!");
+ mpSend({type:"event",sender:myPlayerId,id,expires});
 }
-
-};
-
-
-/* =========================
-   ÁREAS
-========================= */
-
-const areaData={
-
-chicken:{
-x:930,
-y:360,
-min:1,
-types:["common","uncommon","rare"]
-},
-
-tiger:{
-x:1650,
-y:980,
-min:10,
-types:["uncommon","rare","mythic","legendary"]
-},
-
-gorilla:{
-x:2760,
-y:330,
-min:30,
-types:["rare","mythic","legendary","secret"]
-}
-
-};
-
-
-/* =========================
-   PREÇOS VELOCIDADE
-========================= */
-
-const speedCosts=[];
-
-for(let i=2;i<=30;i++){
-
-speedCosts[i]=Math.round(
-100*Math.pow(1.22,i-2)
-);
-
-}
-
-
-/* =========================
-   TRILHAS
-========================= */
-
-const trails=[
-
-{
-name:"Vermelha",
-mult:1.5,
-cost:150,
-icon:"🔴"
-},
-
-{
-name:"Roxa",
-mult:2.5,
-cost:700,
-icon:"🟣"
-},
-
-{
-name:"Azul",
-mult:5,
-cost:2500,
-icon:"🔵"
-},
-
-{
-name:"Verde",
-mult:10,
-cost:9000,
-icon:"🟢"
-},
-
-{
-name:"Amarela",
-mult:15,
-cost:25000,
-icon:"🟡"
-}
-
-];
-
-
-/* =========================
-   FUNÇÕES BÁSICAS
-========================= */
-
-function fmt(n){
-
-return Math.floor(n).toLocaleString("pt-BR");
-
-}
-
-function showToast(text){
-
-toast.textContent=text;
-
-toast.style.display="block";
-
-clearTimeout(showToast.timer);
-
-showToast.timer=setTimeout(()=>{
-
-toast.style.display="none";
-
-},2300);
-
-}
-
-function openModal(html){
-
-modal.innerHTML=html;
-
-modalShade.style.display="flex";
-
-}
-
-function closeModal(){
-
-modalShade.style.display="none";
-
-}
-
-function distance(a,b){
-
-return Math.hypot(
-a.x-b.x,
-a.y-b.y
-);
-
-}
-
-
-/* =========================
-   VELOCIDADE
-========================= */
-
-function baseSpeed(){
-
-return 85+(state.speedLevel-1)*8;
-
-}
-
-function multiplier(){
-
-return state.trail?
-state.trail.mult:
-1;
-
-}
-
-function actualSpeed(){
-
-return baseSpeed()*multiplier();
-
-}
-
-
-/* =========================
-   INTERFACE
-========================= */
-
-function updateUI(){
-
-document.getElementById("money").textContent=
-fmt(state.money);
-
-document.getElementById("speedLevel").textContent=
-state.speedLevel;
-
-document.getElementById("trailName").textContent=
-state.trail?
-state.trail.icon+" "+state.trail.name:
-"Nenhuma";
-
-renderSlots();
-
-}
-
-
-/* =========================
-   SLOTS DA BASE
-========================= */
-
-function renderSlots(){
-
-const box=document.getElementById("slots");
-
-box.innerHTML="";
-
-for(let i=0;i<4;i++){
-
-const slot=document.createElement("div");
-
-slot.className="slot";
-
-if(state.baseEggs[i]){
-
-const e=state.baseEggs[i];
-
-const r=rarity[e.type];
-
-slot.innerHTML=`
-
-${r.emoji}
-
-<small>
-${r.name}
-</small>
-
-<button class="openBtn">
-ABRIR
-</button>
-
-`;
-
-slot.querySelector("button").onclick=()=>{
-
-openEgg(i);
-
-};
-
-}else{
-
-slot.innerHTML=`
-
-🥚
-
-<small>
-Espaço vazio
-</small>
-
-`;
-
-}
-
-box.appendChild(slot);
-
-}
-
-}
-
-
-/* =========================
-   CRIAR OVO
-========================= */
-
-function createEgg(area,type,forced=false){
-
-const data=areaData[area];
-
-if(!data)return;
-
-const r=rarity[type];
-
-const el=document.createElement("div");
-
-el.className=
-"egg "+r.cls;
-
-el.textContent=r.emoji;
-
-const angle=
-Math.random()*Math.PI*2;
-
-const radius=
-75+Math.random()*85;
-
-const x=
-data.x+
-235+
-Math.cos(angle)*radius;
-
-const y=
-data.y+
-180+
-Math.sin(angle)*radius;
-
-el.style.left=x+"px";
-
-el.style.top=y+"px";
-
-eggLayer.appendChild(el);
-
-const egg={
-
-id:state.nextId++,
-area,
-type,
-x,
-y,
-el,
-forced
-
-};
-
-state.eggs.push(egg);
-
-el.onclick=()=>{
-
-tryPickup(egg);
-
-};
-
-return egg;
-
-}
-
-
-/* =========================
-   REMOVER OVO
-========================= */
-
-function removeEgg(egg){
-
-if(
-egg.el &&
-egg.el.parentNode
-){
-
-egg.el.remove();
-
-}
-
-state.eggs=
-state.eggs.filter(e=>e!==egg);
-
-}
-
-
-/* =========================
-   OVO NORMAL
-========================= */
-
-function naturalEgg(area){
-
-const roll=Math.random();
-
-if(area==="chicken"){
-
-if(roll<0.55)
-return "common";
-
-if(roll<0.85)
-return "uncommon";
-
-return "rare";
-
-}
-
-if(area==="tiger"){
-
-if(roll<0.35)
-return "uncommon";
-
-if(roll<0.65)
-return "rare";
-
-if(roll<0.88)
-return "mythic";
-
-return "legendary";
-
-}
-
-if(roll<0.32)
-return "rare";
-
-if(roll<0.62)
-return "mythic";
-
-if(roll<0.88)
-return "legendary";
-
-return "secret";
-
-}
-
-
-function spawnNatural(area){
-
-createEgg(
-area,
-naturalEgg(area),
-false
-);
-
-}
-
-
-/* =========================
-   CHANCES NORMAIS
-   A CADA 5 MINUTOS
-========================= */
-
-function specialChance(){
-
-const roll=Math.random();
-
-/* 10% secreto */
-
-if(roll<0.10){
-
-return "secret";
-
-}
-
-/* 30% mítico */
-
-if(roll<0.40){
-
-return "mythic";
-
-}
-
-return null;
-
-}
-
-
-function spawnSpecialNaturally(){
-
-const type=specialChance();
-
-if(!type)return;
-
-const areas=[
-"chicken",
-"tiger",
-"gorilla"
-];
-
-const area=
-areas[
-Math.floor(
-Math.random()*areas.length
-)
-];
-
-createEgg(
-area,
-type,
-false
-);
-
-showToast(
-"✨ Um ovo "+
-rarity[type].name+
-" apareceu!"
-);
-
-}
-
-
-/* =========================
-   ENCONTRAR OVO
-========================= */
-
-function nearestEgg(){
-
-let best=null;
-
-let bestDistance=125;
-
-for(const egg of state.eggs){
-
-const d=distance(
-{x:state.x,y:state.y},
-{x:egg.x,y:egg.y}
-);
-
-if(d<bestDistance){
-
-bestDistance=d;
-best=egg;
-
-}
-
-}
-
-return best;
-
-}
-
-
-/* =========================
-   PEGAR OVO
-========================= */
-
-function tryPickup(egg){
-
-if(state.carried){
-
-showToast(
-"Você já está carregando um ovo!"
-);
-
-return;
-
-}
-
-const requirement=
-areaData[egg.area].min;
-
-if(state.speedLevel<requirement){
-
-showToast(
-"Você precisa de velocidade "+
-requirement+
-" para essa área."
-);
-
-return;
-
-}
-
-if(
-distance(
-{x:state.x,y:state.y},
-{x:egg.x,y:egg.y}
-)>145
-){
-
-showToast(
-"Chegue mais perto do ovo."
-);
-
-return;
-
-}
-
-state.carried={
-...egg,
-started:performance.now()
-};
-
-removeEgg(egg);
-
-carriedEl.style.display="block";
-
-startCarryTimer();
-
-showToast(
-"🥚 Ovo pego! Volte para a base!"
-);
-
-}
-
-
-/* =========================
-   TEMPO DO OVO
-========================= */
-
-function startCarryTimer(){
-
-if(!state.carried)return;
-
-const e=state.carried;
-
-const baseTime={
-
-common:22,
-uncommon:25,
-rare:30,
-mythic:38,
-legendary:50,
-secret:70
-
-}[e.type]||30;
-
-/*
-Quanto maior a velocidade,
-mais tempo prático o jogador possui.
-*/
-
-const speedBonus=
-1+(state.speedLevel-1)*0.035;
-
-const trailBonus=
-state.trail?
-1+Math.min(
-state.trail.mult,
-15
-)*0.025:
-1;
-
-e.deadline=
-performance.now()+
-baseTime*
-speedBonus*
-trailBonus*
-1000;
-
-timerEl.style.display="block";
-
-}
-
-
-function updateCarry(){
-
-if(!state.carried)return;
-
-const remain=
-Math.max(
-0,
-state.carried.deadline-
-performance.now()
-);
-
-timerEl.textContent=
-"🥚 Tempo: "+
-Math.ceil(remain/1000)+
-"s";
-
-if(remain<=0){
-
-showToast(
-"💨 Você perdeu o ovo!"
-);
-
-state.carried=null;
-
-carriedEl.style.display="none";
-
-timerEl.style.display="none";
-
-}
-
-}
-
-
-/* =========================
-   COLOCAR OVO NA BASE
-========================= */
-
-function depositAtBase(){
-
-if(!state.carried)return;
-
-const inside=
-state.x>120 &&
-state.x<550 &&
-state.y>820 &&
-state.y<1230;
-
-if(!inside)return;
-
-if(state.baseEggs.length>=4){
-
-showToast(
-"A base já está cheia!"
-);
-
-return;
-
-}
-
-const egg=state.carried;
-
-state.baseEggs.push({
-
-type:egg.type,
-area:egg.area
-
-});
-
-state.carried=null;
-
-carriedEl.style.display="none";
-
-timerEl.style.display="none";
-
-updateUI();
-
-showToast(
-"✅ Ovo levado para a base!"
-);
-
-}
-
-
-/* =========================
-   ABRIR OVO
-========================= */
-
-function openEgg(index){
-
-const egg=
-state.baseEggs[index];
-
-if(!egg)return;
-
-const r=
-rarity[egg.type];
-
-const timeText=
-r.open>=60?
-(r.open/60)+" minuto(s)":
-r.open+" segundo(s)";
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-${r.emoji}
-Abrindo ovo ${r.name}
-</h2>
-
-<p>
-Tempo:
-<b>${timeText}</b>
-</p>
-
-<div class="progress">
-<i id="openProgress"></i>
-</div>
-
-<p id="openText">
-Preparando...
-</p>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-const start=performance.now();
-
-const duration=
-r.open*1000;
-
-function opening(){
-
-if(
-modalShade.style.display==="none"
-)return;
-
-const progress=
-Math.min(
-1,
-(performance.now()-start)/
-duration
-);
-
-document.getElementById(
-"openProgress"
-).style.width=
-(progress*100)+"%";
-
-if(progress<1){
-
-document.getElementById(
-"openText"
-).textContent=
-"Abrindo...";
-
-requestAnimationFrame(opening);
-
-return;
-
-}
-
-state.baseEggs.splice(
-index,
-1
-);
-
-state.money+=r.reward;
-
-updateUI();
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-🎉 Pet conseguido!
-</h2>
-
-<p>
-Você conseguiu um pet
-<b>${r.name}</b>!
-</p>
-
-<p>
-💰 Recompensa:
-<b>${fmt(r.reward)}</b>
-</p>
-
-<button class="adminAction" id="ok">
-OK
-</button>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-document.getElementById("ok").onclick=
-closeModal;
-
-}
-
-requestAnimationFrame(opening);
-
-}
-
-
-/* =========================
-   LOJA DE VELOCIDADE
-========================= */
-
-function speedShop(){
-
-let items="";
-
-items+=`
-
-<div class="shopItem">
-
-<b>
-Velocidade atual:
-${state.speedLevel}
-</b>
-
-<p>
-Máximo: 30
-</p>
-
-</div>
-
-`;
-
-for(
-let i=state.speedLevel+1;
-i<=Math.min(30,state.speedLevel+5);
-i++
-){
-
-items+=`
-
-<div class="shopItem">
-
-<b>
-⚡ Velocidade ${i}
-</b>
-
-<p>
-💰 ${fmt(speedCosts[i])}
-</p>
-
-<button data-speed="${i}">
-Comprar
-</button>
-
-</div>
-
-`;
-
-}
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-⚡ Loja de Velocidade
-</h2>
-
-<p>
-Compre velocidade de 1 até 30.
-</p>
-
-<div class="shopGrid">
-${items}
-</div>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-modal.querySelectorAll("[data-speed]")
-.forEach(button=>{
-
-button.onclick=()=>{
-
-const level=
-Number(button.dataset.speed);
-
-if(
-level!==state.speedLevel+1
-){
-
-showToast(
-"Compre as velocidades em ordem."
-);
-
-return;
-
-}
-
-if(
-state.money<
-speedCosts[level]
-){
-
-showToast(
-"Dinheiro insuficiente."
-);
-
-return;
-
-}
-
-state.money-=
-speedCosts[level];
-
-state.speedLevel=
-level;
-
-updateUI();
-
-speedShop();
-
-showToast(
-"⚡ Velocidade aumentada!"
-);
-
-};
-
-});
-
-}
-
-
-/* =========================
-   LOJA DE TRILHAS
-========================= */
-
-function trailShop(){
-
-const items=
-trails.map(
-(t,index)=>`
-
-<div class="shopItem">
-
-<b>
-${t.icon}
-Trilha ${t.name}
-</b>
-
-<p>
-${t.mult}× velocidade
-</p>
-
-<p>
-💰 ${fmt(t.cost)}
-</p>
-
-<button data-trail="${index}">
-${
-state.trail===t?
-"Equipado":
-"Comprar"
-}
-</button>
-
-</div>
-
-`
-).join("");
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-👟 Loja de Trilhas
-</h2>
-
-<p>
-As trilhas são separadas da loja de velocidade.
-</p>
-
-<div class="shopGrid">
-${items}
-</div>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-modal.querySelectorAll("[data-trail]")
-.forEach(button=>{
-
-button.onclick=()=>{
-
-const trail=
-trails[
-Number(button.dataset.trail)
-];
-
-if(state.trail===trail){
-
-showToast(
-"Essa trilha já está equipada."
-);
-
-return;
-
-}
-
-if(
-state.money<trail.cost
-){
-
-showToast(
-"Dinheiro insuficiente."
-);
-
-return;
-
-}
-
-state.money-=trail.cost;
-
-state.trail=trail;
-
-updateUI();
-
-trailShop();
-
-showToast(
-"👟 Trilha equipada!"
-);
-
-};
-
-});
-
-}
-
-
-/* =========================
-   PAINEL DA DM
-========================= */
-
-function adminPanel(){
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-🔐 Painel da DM
-</h2>
-
-<p>
-Os spawns do painel são
-<b>100% garantidos</b>.
-</p>
-
-<select class="select" id="adminArea">
-
-<option value="chicken">
-🐔 Galinha
-</option>
-
-<option value="tiger">
-🐯 Tigre
-</option>
-
-<option value="gorilla">
-🦍 Gorila
-</option>
-
-</select>
-
-<button class="adminAction red" id="spawnMythic">
-🔴 Spawnar Mítico — 100%
-</button>
-
-<button class="adminAction red" id="spawnSecret">
-🟣 Spawnar Secreto — 100%
-</button>
-
-<hr style="margin:15px 0">
-
-<input
-class="select"
-id="giveMoney"
-type="number"
-min="1"
-placeholder="Quantidade de dinheiro"
->
-
-<button class="adminAction" id="give">
-💰 Dar dinheiro
-</button>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-const getArea=()=>
-document.getElementById("adminArea").value;
-
-
-/* MÍTICO — SEM CHANCE, SEM ALEATORIEDADE */
-
-document.getElementById("spawnMythic")
-.onclick=()=>{
-
-createEgg(
-getArea(),
-"mythic",
-true
-);
-
-showToast(
-"🔴 Ovo Mítico spawnado! 100%!"
-);
-
-};
-
-
-/* SECRETO — SEM CHANCE, SEM ALEATORIEDADE */
-
-document.getElementById("spawnSecret")
-.onclick=()=>{
-
-createEgg(
-getArea(),
-"secret",
-true
-);
-
-showToast(
-"🟣 Ovo Secreto spawnado! 100%!"
-);
-
-};
-
-
-/* DAR DINHEIRO */
-
-document.getElementById("give")
-.onclick=()=>{
-
-const amount=
-Number(
-document.getElementById("giveMoney").value
-)||0;
-
-if(amount<=0){
-
-showToast(
-"Digite uma quantidade válida."
-);
-
-return;
-
-}
-
-state.money+=amount;
-
-updateUI();
-
-showToast(
-"💰 Dinheiro adicionado!"
-);
-
-};
-
-}
-
-
-/* =========================
-   LOGIN DM
-========================= */
-
-function adminLogin(){
-
-openModal(`
-
-<button class="close" id="close">
-X
-</button>
-
-<h2>
-🔐 Painel da DM
-</h2>
-
-<p>
-Digite a senha:
-</p>
-
-<input
-class="select"
-id="pass"
-type="password"
-placeholder="Senha"
->
-
-<button class="adminAction" id="login">
-Entrar
-</button>
-
-`);
-
-document.getElementById("close").onclick=
-closeModal;
-
-document.getElementById("login")
-.onclick=()=>{
-
-if(
-document.getElementById("pass").value===
-ADMIN_PASSWORD
-){
-
-adminPanel();
-
-}else{
-
-showToast(
-"Senha incorreta."
-);
-
-}
-
-};
-
-}
-
-
-/* =========================
-   BOTÕES
-========================= */
-
-document.getElementById(
-"speedShopBtn"
-).onclick=speedShop;
-
-document.getElementById(
-"trailShopBtn"
-).onclick=trailShop;
-
-document.getElementById(
-"adminBtn"
-).onclick=adminLogin;
-
-modalShade.addEventListener(
-"click",
-e=>{
-
-if(e.target===modalShade){
-
-closeModal();
-
-}
-
-});
-
-
-/* =========================
-   ANALÓGICO
-========================= */
-
-let joyActive=false;
-
-const joystick=
-document.getElementById("joystick");
-
-const stick=
-document.getElementById("stick");
-
-
-function setJoystick(x,y){
-
-const rect=
-joystick.getBoundingClientRect();
-
-const centerX=
-rect.left+rect.width/2;
-
-const centerY=
-rect.top+rect.height/2;
-
-let dx=x-centerX;
-let dy=y-centerY;
-
-const max=
-rect.width*0.32;
-
-const length=
-Math.hypot(dx,dy);
-
-if(length>max){
-
-dx=
-dx/length*max;
-
-dy=
-dy/length*max;
-
-}
-
-state.joystickX=
-dx/max;
-
-state.joystickY=
-dy/max;
-
-stick.style.transform=
-`translate(${dx}px,${dy}px)`;
-
-}
-
-
-function resetJoystick(){
-
-joyActive=false;
-
-state.joystickX=0;
-state.joystickY=0;
-
-stick.style.transform=
-"translate(0,0)";
-
-}
-
-
-joystick.addEventListener(
-"pointerdown",
-event=>{
-
-joyActive=true;
-
-joystick.setPointerCapture(
-event.pointerId
-);
-
-setJoystick(
-event.clientX,
-event.clientY
-);
-
-}
-);
-
-joystick.addEventListener(
-"pointermove",
-event=>{
-
-if(joyActive){
-
-setJoystick(
-event.clientX,
-event.clientY
-);
-
-}
-
-}
-);
-
-joystick.addEventListener(
-"pointerup",
-resetJoystick
-);
-
-joystick.addEventListener(
-"pointercancel",
-resetJoystick
-);
-
-
-/* =========================
-   PULO
-========================= */
-
-let jump=0;
-
-document.getElementById(
-"jump"
-).addEventListener(
-"pointerdown",
-()=>{
-
-if(jump<=0){
-
-jump=520;
-
-}
-
-}
-);
-
-
-/* =========================
-   BOTÃO DE PEGAR
-========================= */
-
-function updateAction(){
-
-const egg=
-nearestEgg();
-
-if(
-egg &&
-!state.carried
-){
-
-actionBtn.style.display=
-"block";
-
-actionBtn.textContent=
-"🥚 Pegar "+
-rarity[egg.type].name;
-
-}else{
-
-actionBtn.style.display=
-"none";
-
-}
-
-}
-
-
-actionBtn.onclick=()=>{
-
-const egg=
-nearestEgg();
-
-if(egg){
-
-tryPickup(egg);
-
-}
-
-};
-
-
-/* =========================
-   CÂMERA
-========================= */
-
-function render(){
-
-playerEl.style.left=
-state.x+"px";
-
-playerEl.style.top=
-(state.y-state.jumpY)+"px";
-
-
-if(state.carried){
-
-carriedEl.style.left=
-state.x+"px";
-
-carriedEl.style.top=
-(
-state.y-
-state.jumpY-
-55
-)+"px";
-
-}
-
-
-const vw=
-innerWidth;
-
-const vh=
-innerHeight;
-
-const camX=
-Math.max(
-0,
-Math.min(
-3600-vw,
-state.x-vw/2
-)
-);
-
-const camY=
-Math.max(
-0,
-Math.min(
-2200-vh,
-state.y-vh/2
-)
-);
-
-world.style.transform=
-`translate(${-camX}px,${-camY}px)`;
-
-}
-
-
-/* =========================
-   LOOP DO JOGO
-========================= */
-
-function loop(now){
-
-const dt=
-Math.min(
-0.035,
-(now-state.last)/1000
-);
-
-state.last=now;
-
-const speed=
-actualSpeed();
-
-state.vx=
-state.joystickX*speed;
-
-state.vy=
-state.joystickY*speed;
-
-state.x+=
-state.vx*dt;
-
-state.y+=
-state.vy*dt;
-
-
-/* LIMITES DO MAPA */
-
-state.x=
-Math.max(
-30,
-Math.min(
-3570,
-state.x
-)
-);
-
-state.y=
-Math.max(
-30,
-Math.min(
-2170,
-state.y
-)
-);
-
-
-/* PULO */
-
-if(jump>0){
-
-jump-=900*dt;
-
-state.jumpY=
-Math.max(
-0,
-Math.sin(
-Math.max(0,jump)/
-520*
-Math.PI
-)*95
-);
-
-if(jump<=0){
-
-state.jumpY=0;
-
-}
-
-}
-
-
-/* BASE */
-
-depositAtBase();
-
-/* OVO */
-
-updateCarry();
-
-/* BOTÃO */
-
-updateAction();
-
-/* CÂMERA */
-
-render();
-
-requestAnimationFrame(loop);
-
-}
-
-
-/* =========================
-   COMEÇAR JOGO
-========================= */
-
-function startGame(){
-
-updateUI();
-
-/* OVOS INICIAIS */
-
-spawnNatural("chicken");
-spawnNatural("chicken");
-
-spawnNatural("tiger");
-
-spawnNatural("gorilla");
-
-
-/* OVO NORMAL A CADA 15 SEGUNDOS */
 
 setInterval(()=>{
+ for(const id in activeEvents)
+   if(Date.now()>=activeEvents[id])delete activeEvents[id];
+ renderEvents();
+},500);
 
-const areas=[
-"chicken",
-"tiger",
-"gorilla"
-];
+function showShop(){
+ openPanel("🛒 Lojas",`
+ <h3>⚡ Loja de Velocidade</h3>
+ <p>Nível atual: ${state.speedLevel}/100</p>
+ <button onclick="buySpeed()">Comprar +1 velocidade — $${(state.speedLevel*500).toLocaleString()}</button>
 
-const area=
-areas[
-Math.floor(
-Math.random()*areas.length
-)
-];
+ <h3>✨ Loja de Trails</h3>
+ ${Object.entries(trails).map(([k,v])=>`<button onclick="buyTrail('${k}')">${k.toUpperCase()} — ${v}× velocidade</button>`).join("")}
 
-spawnNatural(area);
-
-
-/* máximo de ovos */
-
-if(state.eggs.length>18){
-
-removeEgg(
-state.eggs[0]
-);
-
+ <p>Trail atual: ${state.trail||"nenhum"}</p>`);
 }
 
-},15000);
-
-
-/*
-MÍTICO / SECRETO
-NORMAL:
-
-A cada 5 minutos.
-
-Secreto = 10%
-
-Mítico = 30%
-
-Isso é separado do painel DM.
-*/
-
-setInterval(
-spawnSpecialNaturally,
-300000
-);
-
-requestAnimationFrame(loop);
-
+function buySpeed(){
+ if(state.speedLevel>=100)return toast("Velocidade máxima!");
+ let c=state.speedLevel*500;
+ if(state.money<c)return toast("Dinheiro insuficiente!");
+ state.money-=c;
+ state.speedLevel++;
+ updateHud();
+ showShop();
 }
 
-startGame();
-
-</script>
-
-<!-- PAINEL DE EVENTOS -->
-<div class="event-panel">
-
-  <!-- LOGIN -->
-  <div id="eventLogin">
-    <h3>🔐 Painel de Eventos</h3>
-
-    <input
-      type="password"
-      id="eventPassword"
-      placeholder="Digite a senha"
-    >
-
-    <button onclick="loginEventPanel()">
-      🔓 Entrar
-    </button>
-
-    <p id="loginError"></p>
-  </div>
-
-  <!-- PAINEL -->
-  <div id="eventControls" style="display: none;">
-
-    <h3>🎉 Eventos</h3>
-
-    <button onclick="startEvent('halloween')">
-      🎃 Halloween ×2
-    </button>
-
-    <button onclick="startEvent('natal')">
-      🎄 Natal ×2,5
-    </button>
-
-    <button onclick="startEvent('meteorito')">
-      ☄️ Meteorito ×3,5
-    </button>
-
-    <button onclick="startEvent('speed2x')">
-      ⚡ 2× Velocidade
-    </button>
-
-    <button onclick="startEvent('money2x')">
-      💰 2× Money
-    </button>
-
-    <button onclick="startEvent('pizza')">
-      🍕 Pizza ×5
-    </button>
-
-    <div id="eventStatus">
-      Nenhum evento ativo.
-    </div>
-
-  </div>
-</div>
-
-
-<script>
-
-// =============================
-// 🔐 SENHA DO PAINEL
-// =============================
-
-const EVENT_PANEL_PASSWORD = "REXGAMESPRO3";
-
-function loginEventPanel() {
-
-  const password =
-    document.getElementById("eventPassword").value;
-
-  const error =
-    document.getElementById("loginError");
-
-  if (password === EVENT_PANEL_PASSWORD) {
-
-    document.getElementById("eventLogin").style.display =
-      "none";
-
-    document.getElementById("eventControls").style.display =
-      "block";
-
-    error.innerHTML = "";
-
-  } else {
-
-    error.innerHTML =
-      "❌ Senha incorreta!";
-
-  }
+function buyTrail(k){
+ const prices={
+   red:5000,
+   purple:20000,
+   blue:80000,
+   green:250000,
+   yellow:1000000,
+   alien:5000000
+ };
+ let c=prices[k];
+ if(state.money<c)return toast("Dinheiro insuficiente!");
+ state.money-=c;
+ state.trail=k;
+ updateHud();
+ toast("Trail equipado!");
+ showShop();
 }
 
+function openPanel(title,content){
+ document.getElementById("panelTitle").textContent=title;
+ document.getElementById("panelContent").innerHTML=content;
+ document.getElementById("panel").style.display="block";
+}
 
-// =============================
-// 🎉 EVENTOS
-// =============================
+function closePanel(){
+ document.getElementById("panel").style.display="none";
+}
 
-const EVENTS = {
+document.getElementById("shopBtn").onclick=showShop;
+document.getElementById("dropEggBtn").onclick=dropEgg;
 
-  halloween: {
-    name: "🎃 Halloween",
-    multiplier: 2
-  },
-
-  natal: {
-    name: "🎄 Natal",
-    multiplier: 2.5
-  },
-
-  meteorito: {
-    name: "☄️ Meteorito",
-    multiplier: 3.5
-  },
-
-  speed2x: {
-    name: "⚡ 2× Velocidade",
-    multiplier: 2
-  },
-
-  money2x: {
-    name: "💰 2× Money",
-    multiplier: 2
-  },
-
-  pizza: {
-    name: "🍕 Pizza",
-    multiplier: 5
-  }
-
+document.getElementById("slowBtn").onclick=()=>{
+ state.slow=!state.slow;
+ slowBtn.textContent="🐢 Lento: "+(state.slow?"ON":"OFF");
+ toast(state.slow?"Velocidade reduzida para 1":"Velocidade original restaurada");
 };
 
+document.getElementById("adminBtn").onclick=()=>{
+ const pass=prompt("Senha DM:");
+ if(pass!==ADMIN_PASSWORD)return toast("Senha incorreta!");
 
-// =============================
-// ⏱️ EVENTOS ATIVOS
-// =============================
+ openPanel("🔐 Painel DM/Admin",`
+ <p>Spawn garantido: clique e o pet aparece sem depender da chance normal.</p>
 
-const activeEvents = {};
+ <select id="adminArea">
+   <option value="chicken">🐔 Galinha</option>
+   <option value="tiger">🐯 Tigre</option>
+   <option value="gorilla">🦍 Gorila</option>
+   <option value="dragon">🐉 Dragão</option>
+   <option value="shark">🦈 Tubarão</option>
+   <option value="dino">🦖 Dinossauro</option>
+   <option value="alien">👽 Alienígena</option>
+ </select>
 
+ <button onclick="adminSpawn('mythic')">🔴 Spawn Mítico — 100%</button>
+ <button onclick="adminSpawn('secret')">🟣 Spawn Secret — 100%</button>
+ <button onclick="adminSpawn('eternal')">♾️ Spawn Eterno — 100%</button>
+ <button onclick="adminSpawn('divine')">✨ Spawn Divino — 100%</button>
+ <button onclick="adminSpawn('celestial')">🌌 Spawn Celestial — 100%</button>
 
-// =============================
-// ▶️ ATIVAR EVENTO
-// =============================
+ <input id="giveMoney" type="number" placeholder="Quanto de dinheiro?">
+ <button onclick="adminMoney()">💰 Dar dinheiro</button>
 
-function startEvent(eventId) {
+ <button onclick="adminOpenAll()">🥚 Abrir todos os ovos da base — INSTANTÂNEO</button>
 
-  const event = EVENTS[eventId];
+ <h3>🎉 Eventos</h3>
+ <button onclick="startEvent('halloween')">🎃 Halloween ×2 — 5 min</button>
+ <button onclick="startEvent('natal')">🎄 Natal ×2,5 — 5 min</button>
+ <button onclick="startEvent('meteorito')">☄️ Meteorito ×3,5 — 5 min</button>
+ <button onclick="startEvent('money2x')">💰 2× Dinheiro — 5 min</button>
+ <button onclick="startEvent('speed2x')">⚡ 2× Velocidade — 5 min</button>
+ <button onclick="startEvent('alien5x')">👽 Evento Alienígena — 5× Money — 5 min</button>
+ <button onclick="startEvent('trex5x')">🦖 Evento T-Rex — 5× Money — 5 min</button>
 
-  if (!event) return;
+ <h3>📢 Mensagem Global</h3>
+ <input id="globalMsgInput" type="text" maxlength="120" placeholder="Digite uma mensagem para todos...">
+ <button onclick="sendGlobalMessage()">📢 Enviar mensagem global</button>
 
-  // Evento dura 5 minutos
-  activeEvents[eventId] =
-    Date.now() + 5 * 60 * 1000;
+ <small>Exemplo: ADM REX: disse hola para todos</small>`);
+};
 
-  updateEventDisplay();
-
-
-  setTimeout(() => {
-
-    if (
-      activeEvents[eventId] &&
-      Date.now() >= activeEvents[eventId]
-    ) {
-
-      delete activeEvents[eventId];
-
-      updateEventDisplay();
-
-    }
-
-  }, 5 * 60 * 1000);
-
+function adminSpawn(r){
+ const a=document.getElementById("adminArea").value;
+ createEgg(a,r,true);
+ toast("Spawn "+rarityData[r].name+" garantido!");
+ globalMessage("spawnou um ovo "+rarityData[r].name+"!");
 }
 
-
-// =============================
-// 🔎 VERIFICAR EVENTO
-// =============================
-
-function isEventActive(eventId) {
-
-  if (!activeEvents[eventId]) {
-    return false;
-  }
-
-  if (Date.now() >= activeEvents[eventId]) {
-
-    delete activeEvents[eventId];
-
-    return false;
-  }
-
-  return true;
+function adminMoney(){
+ let n=Number(document.getElementById("giveMoney").value)||0;
+ state.money+=n;
+ updateHud();
+ toast("+$"+n.toLocaleString("pt-BR"));
+ globalMessage("deu $"+n.toLocaleString("pt-BR")+" para este jogador!");
 }
 
+function adminOpenAll(){
+ if(!state.baseEggs.length)return toast("Nenhum ovo na base.");
 
-// =============================
-// 🥚 MULTIPLICADOR DOS OVOS
-// =============================
+ const eggs=[...state.baseEggs];
+ state.baseEggs=[];
+ let total=0;
 
-function getEggEventMultiplier() {
+ eggs.forEach(e=>{
+   state.pets.push(e.rarity);
+   const value=Math.floor(rarityData[e.rarity].value*getPayMultiplier());
+   state.money+=value;
+   total+=value;
+ });
 
-  let multiplier = 1;
+ renderBase();
+ updateHud();
+ toast("🥚 Todos os ovos foram abertos! +$"+total.toLocaleString("pt-BR"));
+  }function move(dt){
+ let sp=getSpeed()*2.2;
+ state.x+=keys.x*sp*dt;
+ state.y+=keys.y*sp*dt;
 
+ if(!state.onGround){
+   state.vy+=28*dt;
+   state.y+=state.vy*dt;
 
-  if (isEventActive("halloween")) {
-    multiplier *= 2;
-  }
+   if(state.y>=1320){
+     state.y=1320;
+     state.vy=0;
+     state.onGround=true;
+   }
+ }
 
+ if(state.x<20)state.x=20;
+ if(state.y<20)state.y=20;
+ if(state.x>15950)state.x=15950;
+ if(state.y>2950)state.y=2950;
 
-  if (isEventActive("natal")) {
-    multiplier *= 2.5;
-  }
-
-
-  if (isEventActive("meteorito")) {
-    multiplier *= 3.5;
-  }
-
-
-  if (isEventActive("pizza")) {
-    multiplier *= 5;
-  }
-
-
-  return multiplier;
+ if(state.carried && inBase())depositEgg();
 }
 
+function render(){
+ player.style.left=state.x+"px";
+ player.style.top=state.y+"px";
 
-// =============================
-// 💰 MULTIPLICADOR DE MONEY
-// =============================
+ player.style.transform=`translateY(${state.onGround?0:Math.min(0,state.vy*-1*0.6)}px)`;
 
-function getMoneyEventMultiplier() {
+ camera.x=state.x-innerWidth/2;
+ camera.y=state.y-innerHeight/2;
 
-  if (isEventActive("money2x")) {
-    return 2;
-  }
+ camera.x=Math.max(0,Math.min(16000-innerWidth,camera.x));
+ camera.y=Math.max(0,Math.min(3000-innerHeight,camera.y));
 
-  return 1;
+ world.style.transform=`translate(${-camera.x}px,${-camera.y}px)`;
+
+ if(state.carried){
+   carriedEl.style.left=(state.x+8)+"px";
+   carriedEl.style.top=(state.y-45)+"px";
+ }
 }
 
-
-// =============================
-// ⚡ MULTIPLICADOR DE VELOCIDADE
-// =============================
-
-function getSpeedEventMultiplier() {
-
-  if (isEventActive("speed2x")) {
-    return 2;
-  }
-
-  return 1;
+function loop(t){
+ let dt=Math.min(.05,(t-last)/1000);
+ last=t;
+ move(dt);
+ render();
+ requestAnimationFrame(loop);
 }
 
+requestAnimationFrame(loop);
+mpInit();
 
-// =============================
-// 🥚 VALOR FINAL DO OVO
-// =============================
+let joy=document.getElementById("joystick");
+let stick=document.getElementById("stick");
+let drag=false;
 
-function getEggEventValue(baseValue) {
+function setJoy(e){
+ const r=joy.getBoundingClientRect();
+ let x=e.clientX-r.left-r.width/2;
+ let y=e.clientY-r.top-r.height/2;
 
-  return Math.floor(
-    baseValue * getEggEventMultiplier()
-  );
+ let m=Math.min(r.width*.35,Math.hypot(x,y));
+ let a=Math.atan2(y,x);
 
+ x=Math.cos(a)*m;
+ y=Math.sin(a)*m;
+
+ stick.style.transform=`translate(${x}px,${y}px)`;
+
+ keys.x=x/(r.width*.35);
+ keys.y=y/(r.height*.35);
 }
 
+joy.addEventListener("pointerdown",e=>{
+ drag=true;
+ joy.setPointerCapture(e.pointerId);
+ setJoy(e);
+});
 
-// =============================
-// 💰 VALOR FINAL DO MONEY
-// =============================
+joy.addEventListener("pointermove",e=>{
+ if(drag)setJoy(e);
+});
 
-function getMoneyEventValue(baseMoney) {
+joy.addEventListener("pointerup",()=>{
+ drag=false;
+ keys.x=0;
+ keys.y=0;
+ stick.style.transform="translate(0,0)";
+});
 
-  return Math.floor(
-    baseMoney * getMoneyEventMultiplier()
-  );
+joy.addEventListener("pointercancel",()=>{
+ drag=false;
+ keys.x=0;
+ keys.y=0;
+ stick.style.transform="translate(0,0)";
+});
 
+document.getElementById("jumpBtn").onclick=()=>{
+ if(state.onGround){
+   state.vy=-12;
+   state.onGround=false;
+ }
+};
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="w"||e.key==="ArrowUp")keys.y=-1;
+ if(e.key==="s"||e.key==="ArrowDown")keys.y=1;
+ if(e.key==="a"||e.key==="ArrowLeft")keys.x=-1;
+ if(e.key==="d"||e.key==="ArrowRight")keys.x=1;
+
+ if(e.code==="Space"&&state.onGround){
+   state.vy=-12;
+   state.onGround=false;
+ }
+});
+
+document.addEventListener("keyup",e=>{
+ if(["w","ArrowUp","s","ArrowDown"].includes(e.key))keys.y=0;
+ if(["a","ArrowLeft","d","ArrowRight"].includes(e.key))keys.x=0;
+});
+
+for(let i=0;i<25;i++){
+ let t=document.createElement("div");
+ t.className="tree";
+ t.style.left=(500+Math.random()*4500)+"px";
+ t.style.top=(100+Math.random()*2600)+"px";
+ world.appendChild(t);
 }
 
-
-// =============================
-// 📊 ATUALIZAR PAINEL
-// =============================
-
-function updateEventDisplay() {
-
-  const status =
-    document.getElementById("eventStatus");
-
-  if (!status) return;
-
-
-  const active = [];
-
-
-  for (const eventId in EVENTS) {
-
-    if (isEventActive(eventId)) {
-
-      const remaining =
-        Math.max(
-          0,
-          activeEvents[eventId] - Date.now()
-        );
-
-
-      const minutes =
-        Math.floor(
-          remaining / 60000
-        );
-
-
-      const seconds =
-        Math.floor(
-          (remaining % 60000) / 1000
-        );
-
-
-      active.push(
-        EVENTS[eventId].name +
-        " — " +
-        minutes +
-        ":" +
-        String(seconds).padStart(2, "0")
-      );
-
-    }
-
-  }
-
-
-  if (active.length === 0) {
-
-    status.innerHTML =
-      "Nenhum evento ativo.";
-
-  } else {
-
-    status.innerHTML =
-      "<b>Eventos ativos:</b><br>" +
-      active.join("<br>");
-
-  }
-
+for(let i=0;i<25;i++){
+ let r=document.createElement("div");
+ r.className="rock";
+ r.style.left=(300+Math.random()*5500)+"px";
+ r.style.top=(100+Math.random()*2700)+"px";
+ world.appendChild(r);
 }
 
+function spawnNatural(){
+ for(const area of Object.keys(areaData)){
+   if(Math.random()<.7)createEgg(area,weightedRarity(area));
+ }
+}
 
-// Atualiza o contador a cada segundo
-setInterval(
-  updateEventDisplay,
-  1000
-);
+setInterval(spawnNatural,15000);
+
+renderBase();
+updateHud();
+
+for(const area of Object.keys(areaData)){
+ for(let i=0;i<2;i++){
+   createEgg(area,weightedRarity(area));
+ }
+}
 
 </script>
-
-
-<style>
-
-.event-panel {
-
-  background: #202020;
-
-  color: white;
-
-  padding: 15px;
-
-  border-radius: 12px;
-
-  margin: 10px;
-
-  max-width: 320px;
-
-}
-
-
-.event-panel h3 {
-
-  margin-top: 0;
-
-}
-
-
-.event-panel input {
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  padding: 12px;
-
-  margin-bottom: 8px;
-
-  border: none;
-
-  border-radius: 8px;
-
-  font-size: 16px;
-
-}
-
-
-.event-panel button {
-
-  display: block;
-
-  width: 100%;
-
-  margin: 7px 0;
-
-  padding: 12px;
-
-  border: none;
-
-  border-radius: 8px;
-
-  font-size: 16px;
-
-  cursor: pointer;
-
-}
-
-
-.event-panel button:active {
-
-  transform: scale(0.97);
-
-}
-
-
-#loginError {
-
-  color: #ff5555;
-
-  font-weight: bold;
-
-}
-
-
-#eventStatus {
-
-  margin-top: 12px;
-
-  padding: 10px;
-
-  background: #111;
-
-  border-radius: 8px;
-
-  line-height: 1.6;
-
-}
-
-</style>
+</body>
+</html>
